@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chapter Quizzes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --primary-hover: #4338ca;
+      --background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+      --text-color: #1f2937;
+      --button-radius: 12px;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--text-color);
+    }
+    h1 {
+      margin-bottom: 40px;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 800px;
+    }
+    .button {
+      background-color: var(--primary-color);
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 150px;
+      border-radius: var(--button-radius);
+      box-shadow: var(--shadow);
+      transition: transform 0.2s ease, background-color 0.2s ease;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+    .button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-4px);
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Select a Chapter Quiz</h1>
+  <div class="container">
+    <a href="introduction.html" class="button" target="_blank" rel="noopener noreferrer">1 Introduction</a>
+    <a href="foodcomposition.html" class="button" target="_blank" rel="noopener noreferrer">2 Food Composition</a>
+    <a href="challanges.html" class="button" target="_blank" rel="noopener noreferrer">3 Challenges</a>
+    <a href="overallqualitycontrol.html" class="button" target="_blank" rel="noopener noreferrer">4 Quality Control</a>
+    <a href="heating.html" class="button" target="_blank" rel="noopener noreferrer">5 Heat Treatment</a>
+    <a href="zdvalues.html" class="button" target="_blank" rel="noopener noreferrer">6 Z and D Values</a>
+    <a href="concentration.html" class="button" target="_blank" rel="noopener noreferrer">7 Concentration</a>
+    <a href="drying.html" class="button" target="_blank" rel="noopener noreferrer">8 Drying</a>
+    <a href="cleaning.html" class="button" target="_blank" rel="noopener noreferrer">9 Cleaning</a>
+  </div>
+</body>
+</html>

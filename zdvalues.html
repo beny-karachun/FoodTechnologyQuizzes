@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>חידון – בעיות ערכי Z/D</title>
+  <style>
+    /* עיצוב מודרני ומינימליסטי לשנת 2025 */
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+      direction: rtl;
+    }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    .question {
+      font-size: 1.1em;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #e7e7e7;
+      text-align: right;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    .options button:hover {
+      background-color: #d7d7d7;
+    }
+    .options button.correct {
+      background-color: #c8e6c9;
+      border-color: #a5d6a7;
+    }
+    .options button.incorrect {
+      background-color: #ffcdd2;
+      border-color: #ef9a9a;
+    }
+    .feedback {
+      margin-top: 10px;
+      font-size: 1em;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .feedback span {
+      margin-left: 10px;
+      font-size: 1.2em;
+    }
+    .hidden {
+      display: none;
+    }
+    #nextButton, #viewAllButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: #fff;
+      transition: background-color 0.3s;
+    }
+    #nextButton:hover, #viewAllButton:hover {
+      background-color: #0056b3;
+    }
+    /* All Answers (התשובות) container */
+    #allAnswersContainer {
+      display: none;
+      max-height: 600px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+    .all-question {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+    .all-question:last-child {
+      border-bottom: none;
+    }
+    .all-options {
+      margin-top: 10px;
+      list-style: none;
+      padding: 0;
+    }
+    .all-options li {
+      margin: 4px 0;
+    }
+    .all-options li.correct {
+      color: green;
+      font-weight: bold;
+    }
+    #backButton {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: #fff;
+      transition: background-color 0.3s;
+    }
+    #backButton:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="quizContainer">
+    <h1 style="text-align:center;">חידון – בעיות ערכי Z/D</h1>
+    <div id="questionContainer"></div>
+    <div id="optionsContainer" class="options"></div>
+    <div id="explanationContainer" class="feedback hidden"></div>
+    <button id="nextButton" class="hidden">השאלה הבאה</button>
+    <button id="viewAllButton">הצג את כל התשובות</button>
+  </div>
+
+  <div class="container" id="allAnswersContainer">
+    <h2 style="text-align:center;">כל התשובות</h2>
+    <div id="allAnswersContent"></div>
+    <button id="backButton">חזרה לחידון</button>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        // Question 1 (with improved readability for mixed RTL/LTR content)
+        question: "תהליך פסטור של חלב מתבצע ב־<span dir='ltr'>72°C</span>. אם ערך ה‑D של <span dir='ltr'>Listeria monocytogenes</span> בטמפרטורה זו הוא 15 שניות, כמה זמן נדרש להפחתה של 3 סדר גודל?",
+        options: ["5 שניות", "15 שניות", "45 שניות", "135 שניות"],
+        correct: 2,
+        explanation: "הפחתה של 3 סדר גודל = 3 × 15 שניות = 45 שניות."
+      },
+      {
+        // Question 2
+        question: "חיידק מסוים בעל ערך D של 2 דקות ב־<span dir='ltr'>121°C</span>. אם הטמפרטורה עולה ל־<span dir='ltr'>127°C</span> וערך ה‑Z הוא <span dir='ltr'>6°C</span>, מה יהיה ערך ה‑D החדש ב־<span dir='ltr'>127°C</span>?",
+        options: ["0.2 דקות", "1 דקה", "4 דקות", "8 דקות"],
+        correct: 0,
+        explanation: "log(D₂/2) = (121–127)/6 = -1 ⟹ D₂ = 2×10⁻¹ = 0.2 דקות."
+      },
+      {
+        // Question 3
+        question: "חיידק <span dir='ltr'>E. coli</span> במיץ תפוחים בטמפרטורה של <span dir='ltr'>65°C</span> בעל ערך D של 1.0 דקות. אם נדרש להשיג הפחתה של 5 סדר גודל, כמה זמן פסטור נדרש?",
+        options: ["1 דקה", "5 דקות", "6 דקות", "10 דקות"],
+        correct: 1,
+        explanation: "5 × 1.0 דקות = 5 דקות."
+      },
+      {
+        // Question 4
+        question: "תהליך פסטור מתבצע ב־<span dir='ltr'>90°C</span>, כאשר ערך ה‑D הוא 2 דקות וערך ה‑Z הוא <span dir='ltr'>10°C</span>. מה יהיה ערך ה‑D ב־<span dir='ltr'>100°C</span>?",
+        options: ["0.2 דקות", "1 דקה", "2 דקות", "20 דקות"],
+        correct: 0,
+        explanation: "log(D₂/2) = (90–100)/10 = -1 ⟹ D₂ = 2×10⁻¹ = 0.2 דקות."
+      },
+      {
+        // Question 5
+        question: "בתהליך עיקור עם F₀ = 10 דקות ו‑Z = <span dir='ltr'>10°C</span>, מהו זמן החשיפה ב־<span dir='ltr'>111.1°C</span> אם טמפרטורת הייחוס היא <span dir='ltr'>121.1°C</span>?",
+        options: ["1 דקה", "10 דקות", "100 דקות", "0.1 דקות"],
+        correct: 0,
+        explanation: "FT = 10 × 10^((111.1–121.1)/10) = 10 × 10⁻¹ = 1 דקה."
+      },
+      {
+        // Question 6
+        question: "בטמפרטורה של <span dir='ltr'>115°C</span>, ערך ה‑D של Clostridium botulinum הוא 0.25 דקות. אם נדרש הפחתה של 12D, מהו זמן העיקור הנדרש?",
+        options: ["0.25 דקות", "3 דקות", "30 דקות", "48 דקות"],
+        correct: 1,
+        explanation: "12 × 0.25 דקות = 3 דקות."
+      },
+      {
+        // Question 7
+        question: "אם ערך ה‑Z הוא <span dir='ltr'>8°C</span>, בכמה מעלות יש להעלות את הטמפרטורה כדי להקטין את ערך ה‑D פי 10 (כלומר, להפחית ב־1 סדר גודל)?",
+        options: ["0.8°C", "8°C", "10°C", "80°C"],
+        correct: 1,
+        explanation: "ערך ה‑Z הוא השינוי הדרוש לשינוי D בסדר גודל אחד, לכן <span dir='ltr'>8°C</span>."
+      },
+      {
+        // Question 8
+        question: "שמרים במיץ פירות בטמפרטורה של <span dir='ltr'>60°C</span> בעלי ערך D של 2 דקות. אם יש להפחית את האוכלוסייה מ־<span dir='ltr'>10⁴ CFU/mL</span> לפחות מ־<span dir='ltr'>1 CFU/mL</span> (4 סדר גודל), כמה זמן פסטור נדרש?",
+        options: ["6 דקות", "8 דקות", "10 דקות", "12 דקות"],
+        correct: 1,
+        explanation: "4 × 2 דקות = 8 דקות."
+      },
+      {
+        // Question 9
+        question: "לאנזים מסוים, ערך ה‑Z הוא <span dir='ltr'>10°C</span>. אם קצב האינאקטיבציה גדל פי 100, מהו השינוי הדרוש בטמפרטורה?",
+        options: ["1°C", "10°C", "20°C", "100°C"],
+        correct: 2,
+        explanation: "פי 100 = 2 סדר גודל, לכן 2×10 = 20°C."
+      },
+      {
+        // Question 10
+        question: "תהליך פסטור מתוכנן להשגת הפחתה של 6D עבור Salmonella. אם ב־<span dir='ltr'>68°C</span> ערך ה‑D הוא 0.5 דקות (סה״כ 6×0.5 = 3 דקות) ו‑Z = <span dir='ltr'>5°C</span>, מהו זמן החשיפה ב־<span dir='ltr'>73°C</span> להשגת אותה הפחתה?",
+        options: ["3 דקות", "0.3 דקות", "0.03 דקות", "0.003 דקות"],
+        correct: 1,
+        explanation: "D(73°C) = 0.5 × 10^((68–73)/5) = 0.5 × 10⁻¹ = 0.05 דקות, ולכן זמן כולל = 6 × 0.05 = 0.3 דקות."
+      },
+      // Additional questions (11-15) remain unchanged
+      {
+        question: "תהליך חימום ב-UHT מתבצע ב‑<span dir='ltr'>140°C</span>. אם ערך ה‑D עבור חיידק מסוים ב‑<span dir='ltr'>140°C</span> הוא 0.05 דקות, כמה זמן נדרש להפחתה של 4 סדר גודל?",
+        options: ["0.1 דקות", "0.2 דקות", "0.25 דקות", "0.3 דקות"],
+        correct: 1,
+        explanation: "4 × 0.05 דקות = 0.2 דקות."
+      },
+      {
+        question: "חיידק בעל ערך D של 1.5 דקות ב‑<span dir='ltr'>115°C</span> עובר חימום ל‑<span dir='ltr'>120°C</span>. אם ערך ה‑Z הוא <span dir='ltr'>7°C</span>, מהו ערך ה‑D ב‑<span dir='ltr'>120°C</span>?",
+        options: ["0.3 דקות", "0.5 דקות", "1.5 דקות", "2.0 דקות"],
+        correct: 0,
+        explanation: "log(D₂/1.5) = (115–120)/7 ≈ -0.71, ולכן D₂ ≈ 1.5×10^(–0.71) ≈ 0.3 דקות."
+      },
+      {
+        question: "בתהליך עיקור, אם F₀ = 10 דקות בטמפרטורה של <span dir='ltr'>121.1°C</span>, מהו זמן החשיפה השווה ב‑<span dir='ltr'>131.1°C</span> כאשר Z = <span dir='ltr'>10°C</span>?",
+        options: ["10 דקות", "50 דקות", "100 דקות", "1000 דקות"],
+        correct: 2,
+        explanation: "FT = 10 × 10^((131.1–121.1)/10) = 10 × 10¹ = 100 דקות."
+      },
+      {
+        question: "חיידק מסוים בעל ערך D של 3 דקות ב‑<span dir='ltr'>100°C</span>. אם הטמפרטורה יורדת ל‑<span dir='ltr'>95°C</span> ו‑Z = <span dir='ltr'>5°C</span>, מה יהיה ערך ה‑D ב‑<span dir='ltr'>95°C</span>?",
+        options: ["3 דקות", "6 דקות", "30 דקות", "60 דקות"],
+        correct: 2,
+        explanation: "log(D₉₅/3) = (100–95)/5 = 1 ⟹ D₉₅ = 3×10¹ = 30 דקות."
+      },
+      {
+        question: "בתהליך פסטור, אם ערך ה‑D של חיידק מסוים ב‑<span dir='ltr'>110°C</span> הוא 1.2 דקות, כמה זמן נדרש להשגת הפחתה של 7 סדר גודל?",
+        options: ["7.2 דקות", "8.4 דקות", "10.2 דקות", "12 דקות"],
+        correct: 1,
+        explanation: "7 × 1.2 = 8.4 דקות."
+      }
+    ];
+    
+    let currentQuestion = 0;
+    
+    function loadQuestion() {
+      const questionContainer = document.getElementById("questionContainer");
+      const optionsContainer = document.getElementById("optionsContainer");
+      const explanationContainer = document.getElementById("explanationContainer");
+      const nextButton = document.getElementById("nextButton");
+      
+      // ניקוי התוכן הקודם
+      questionContainer.innerHTML = "";
+      optionsContainer.innerHTML = "";
+      explanationContainer.innerHTML = "";
+      explanationContainer.classList.add("hidden");
+      nextButton.classList.add("hidden");
+      
+      if (currentQuestion < questions.length) {
+        const q = questions[currentQuestion];
+        questionContainer.innerHTML = `<div class="question">שאלה ${currentQuestion + 1}: ${q.question}</div>`;
+        q.options.forEach((option, index) => {
+          const btn = document.createElement("button");
+          btn.innerHTML = option;
+          btn.onclick = () => selectOption(index);
+          optionsContainer.appendChild(btn);
+        });
+      } else {
+        questionContainer.innerHTML = `<div class="question" style="text-align:center;">החידון הסתיים! כל הכבוד.</div>`;
+        document.getElementById("viewAllButton").classList.add("hidden");
+      }
+    }
+    
+    function selectOption(selectedIndex) {
+      const q = questions[currentQuestion];
+      const buttons = document.querySelectorAll("#optionsContainer button");
+      
+      // נטרל את כל הכפתורים
+      buttons.forEach(btn => btn.disabled = true);
+      
+      if (selectedIndex === q.correct) {
+        buttons[selectedIndex].classList.add("correct");
+        document.getElementById("explanationContainer").innerHTML = `<span>✓</span> נכון! ${q.explanation}`;
+      } else {
+        buttons[selectedIndex].classList.add("incorrect");
+        buttons[q.correct].classList.add("correct");
+        document.getElementById("explanationContainer").innerHTML = `<span>✗</span> לא נכון. ${q.explanation}`;
+      }
+      document.getElementById("explanationContainer").classList.remove("hidden");
+      document.getElementById("nextButton").classList.remove("hidden");
+    }
+    
+    document.getElementById("nextButton").addEventListener("click", () => {
+      currentQuestion++;
+      loadQuestion();
+    });
+    
+    // הצגת כל התשובות
+    function showAllAnswers() {
+      const allContainer = document.getElementById("allAnswersContainer");
+      const allContent = document.getElementById("allAnswersContent");
+      allContent.innerHTML = "";
+      
+      questions.forEach((q, idx) => {
+        const div = document.createElement("div");
+        div.classList.add("all-question");
+        div.innerHTML = `<div class="question">שאלה ${idx + 1}: ${q.question}</div>`;
+        const ul = document.createElement("ul");
+        ul.classList.add("all-options");
+        q.options.forEach((option, i) => {
+          const li = document.createElement("li");
+          li.innerHTML = option + (i === q.correct ? " (תשובה נכונה)" : "");
+          if (i === q.correct) li.classList.add("correct");
+          ul.appendChild(li);
+        });
+        const expl = document.createElement("div");
+        expl.classList.add("explanation");
+        expl.innerHTML = q.explanation;
+        div.appendChild(ul);
+        div.appendChild(expl);
+        allContent.appendChild(div);
+      });
+      
+      document.getElementById("quizContainer").style.display = "none";
+      allContainer.style.display = "block";
+    }
+    
+    document.getElementById("viewAllButton").addEventListener("click", showAllAnswers);
+    
+    document.getElementById("backButton").addEventListener("click", () => {
+      document.getElementById("allAnswersContainer").style.display = "none";
+      document.getElementById("quizContainer").style.display = "block";
+    });
+    
+    loadQuestion();
+  </script>
+</body>
+</html>
