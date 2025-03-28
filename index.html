@@ -1,85 +1,194 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Chapter Quizzes</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary-color: #4f46e5;
-      --primary-hover: #4338ca;
-      --background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
-      --text-color: #1f2937;
-      --button-radius: 12px;
-      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--background);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      color: var(--text-color);
-    }
-    h1 {
-      margin-bottom: 40px;
-      font-size: 2rem;
-      font-weight: 600;
-    }
-    .container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 20px;
-      width: 100%;
-      max-width: 800px;
-    }
-    .button {
-      background-color: var(--primary-color);
-      color: #fff;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 150px;
-      border-radius: var(--button-radius);
-      box-shadow: var(--shadow);
-      transition: transform 0.2s ease, background-color 0.2s ease;
-      font-size: 1.1rem;
-      font-weight: 500;
-    }
-    .button:hover {
-      background-color: var(--primary-hover);
-      transform: translateY(-4px);
-    }
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.5rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>חידוני טכנולוגיית מזון</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0056b3; /* A slightly deeper blue */
+            --primary-hover-bg: #f0f7ff; /* Light blue background on hover */
+            --card-bg: #ffffff;
+            --text-color: #343a40;
+            --text-light: #6c757d;
+            --body-bg: #f8f9fa; /* Very light gray */
+            --border-color: #e9ecef;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            --border-radius: 10px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px; /* Base font size */
+        }
+
+        body {
+            font-family: 'Assistant', sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Align items to the start */
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .portal-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .portal-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .portal-header p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Slightly wider cards */
+            gap: 25px;
+            width: 100%;
+            max-width: 1000px; /* Allow slightly wider container */
+        }
+
+        .quiz-card {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            min-height: 160px; /* Fixed height */
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--hover-shadow);
+            background-color: var(--primary-hover-bg);
+            border-color: var(--primary-color);
+        }
+
+        .quiz-card .chapter-number {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .quiz-card .chapter-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .quiz-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 20px;
+            }
+            .portal-header h1 {
+                font-size: 2rem;
+            }
+            .portal-header p {
+                font-size: 1rem;
+            }
+            .quiz-card {
+                padding: 25px 15px;
+                 min-height: 140px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 25px 15px;
+            }
+            .quiz-grid {
+                grid-template-columns: 1fr; /* Single column on small screens */
+                gap: 15px;
+            }
+             .portal-header h1 {
+                font-size: 1.8rem;
+            }
+             .quiz-card {
+                 min-height: auto; /* Let height be auto */
+                 padding: 20px;
+             }
+        }
+    </style>
 </head>
 <body>
-  <h1>Select a Chapter Quiz</h1>
-  <div class="container">
-    <a href="introduction.html" class="button" target="_blank" rel="noopener noreferrer">1 Introduction</a>
-    <a href="foodcomposition.html" class="button" target="_blank" rel="noopener noreferrer">2 Food Composition</a>
-    <a href="challanges.html" class="button" target="_blank" rel="noopener noreferrer">3 Challenges</a>
-    <a href="overallqualitycontrol.html" class="button" target="_blank" rel="noopener noreferrer">4 Quality Control</a>
-    <a href="heating.html" class="button" target="_blank" rel="noopener noreferrer">5 Heat Treatment</a>
-    <a href="zdvalues.html" class="button" target="_blank" rel="noopener noreferrer">6 Z and D Values</a>
-    <a href="concentration.html" class="button" target="_blank" rel="noopener noreferrer">7 Concentration</a>
-    <a href="drying.html" class="button" target="_blank" rel="noopener noreferrer">8 Drying</a>
-    <a href="cleaning.html" class="button" target="_blank" rel="noopener noreferrer">9 Cleaning</a>
-  </div>
+
+    <header class="portal-header">
+        <h1>מרכז חידונים - טכנולוגיית מזון</h1>
+        <p>בחר/י את החידון הרצוי מהרשימה למטה כדי להתחיל.</p>
+    </header>
+
+    <nav class="quiz-grid">
+        <a href="introduction_new.html" class="quiz-card" target="_blank" rel="noopener noreferrer">
+            <span class="chapter-number">פרק 1</span>
+            <span class="chapter-title">מבוא כללי</span>
+        </a>
+        <a href="foodcomposition_new.html" class="quiz-card" target="_blank" rel="noopener noreferrer">
+            <span class="chapter-number">פרק 2</span>
+            <span class="chapter-title">הרכב המזון</span>
+        </a>
+        <a href="challanges_new.html" class="quiz-card" target="_blank" rel="noopener noreferrer">
+            <span class="chapter-number">פרק 3</span>
+            <span class="chapter-title">אתגרים ומגמות</span>
+        </a>
+        <a href="overallqualitycontrol_new.html" class="quiz-card" target="_blank" rel="noopener noreferrer">
+            <span class="chapter-number">פרק 4</span>
+            <span class="chapter-title">איכות ובטיחות</span>
+        </a>
+        <a href="heating_new.html" class="quiz-card" target="_blank" rel="noopener noreferrer">
+            <span class="chapter-number">פרק 5</span>
+            <span class="chapter-title">טיפולים תרמיים</span>
+        </a>
+        <a href="zdvalues_new.html" class="quiz-card" target="_blank" rel="noopener noreferrer">
+            <span class="chapter-number">פרק 6</span>
+            <span class="chapter-title">ערכי Z ו-D</span>
+        </a>
+        <a href="concentration_new.html" class="quiz-card" target="_blank" rel="noopener noreferrer">
+            <span class="chapter-number">פרק 7</span>
+            <span class="chapter-title">ריכוז ואיוד</span>
+        </a>
+        <a href="drying_new.html" class="quiz-card" target="_blank" rel="noopener noreferrer">
+            <span class="chapter-number">פרק 8</span>
+            <span class="chapter-title">ייבוש</span>
+        </a>
+        <a href="cleaning_new.html" class="quiz-card" target="_blank" rel="noopener noreferrer">
+            <span class="chapter-number">פרק 9</span>
+            <span class="chapter-title">ניקוי וחיטוי</span>
+        </a>
+    </nav>
+
 </body>
 </html>

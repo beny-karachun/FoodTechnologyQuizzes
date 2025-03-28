@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>חידון – תעשיית המזון וטכנולוגיית המזון</title>
+  <style>
+    :root {
+      --primary-color: #007bff; /* Blue */
+      --primary-hover-color: #0056b3;
+      --correct-color: #28a745; /* Green */
+      --correct-bg-color: #d4edda;
+      --incorrect-color: #dc3545; /* Red */
+      --incorrect-bg-color: #f8d7da;
+      --explanation-bg-color: #e2e3e5; /* Light Gray */
+      --explanation-border-color: #adb5bd;
+      --text-color: #343a40; /* Dark Gray */
+      --light-text-color: #6c757d; /* Medium Gray */
+      --background-color: #f8f9fa; /* Very Light Gray */
+      --container-bg-color: #ffffff; /* White */
+      --border-color: #dee2e6; /* Light Gray Border */
+      --button-secondary-bg: #6c757d; /* Gray for 'View All' */
+      --button-secondary-hover: #5a6268;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      direction: rtl;
+      text-align: right;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 25px;
+      background-color: var(--container-bg-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .quiz-header {
+        text-align: center;
+        margin-bottom: 25px;
+        color: var(--primary-color);
+        font-size: 1.8em;
+        font-weight: 600;
+    }
+
+    .question-container {
+      background-color: var(--container-bg-color); /* Consistent background */
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .question-text {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .option {
+      margin-bottom: 12px;
+    }
+
+    button.option-button {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 1em;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background-color: var(--container-bg-color);
+      color: var(--text-color);
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+      text-align: right;
+    }
+
+    button.option-button:hover:not(:disabled) {
+      background-color: #f1f3f5; /* Lighter gray on hover */
+      border-color: #ced4da;
+    }
+
+    button.option-button:active:not(:disabled) {
+        transform: scale(0.99);
+    }
+
+    button.option-button:disabled {
+        cursor: default;
+        opacity: 0.8;
+    }
+
+    button.option-button.correct {
+      background-color: var(--correct-bg-color);
+      border-color: var(--correct-color);
+      color: var(--correct-color);
+      font-weight: 500;
+    }
+
+    button.option-button.incorrect {
+      background-color: var(--incorrect-bg-color);
+      border-color: var(--incorrect-color);
+      color: var(--incorrect-color);
+      font-weight: 500;
+    }
+
+     button.option-button .feedback-icon {
+        float: left;
+        font-weight: bold;
+        margin-left: 10px;
+     }
+
+    .explanation {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: var(--explanation-bg-color);
+      border-right: 4px solid var(--explanation-border-color); /* Right border for RTL */
+      border-radius: 4px;
+      font-size: 0.95em;
+      color: var(--light-text-color);
+    }
+    .explanation strong {
+        color: var(--text-color);
+    }
+
+    .quiz-controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+    }
+
+    .control-button {
+      padding: 10px 25px;
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .control-button:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    #next-btn {
+      background-color: var(--primary-color);
+    }
+    #next-btn:hover {
+      background-color: var(--primary-hover-color);
+    }
+
+    #view-all-btn {
+      background-color: var(--button-secondary-bg);
+    }
+     #view-all-btn:hover {
+      background-color: var(--button-secondary-hover);
+    }
+
+    .all-questions-container {
+      display: none;
+      margin-top: 30px;
+      max-height: 500px; /* Increased height */
+      overflow-y: auto;
+      background-color: var(--container-bg-color);
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+     .all-questions-container h2 {
+        text-align: center;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+     }
+
+    .all-question {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .all-question:last-child {
+        border-bottom: none;
+    }
+
+     .all-question h3 {
+        font-size: 1.1em;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 10px;
+     }
+     .all-question ul {
+         list-style: none;
+         padding-right: 15px; /* Indentation for options */
+         margin-top: 5px;
+         margin-bottom: 10px;
+     }
+      .all-question li {
+         margin-bottom: 5px;
+         color: var(--light-text-color);
+      }
+      .all-question li.correct-answer {
+          color: var(--correct-color);
+          font-weight: 500;
+      }
+       .all-question .all-explanation {
+           font-size: 0.9em;
+           color: var(--light-text-color);
+           padding-right: 15px;
+       }
+        .all-question .all-explanation strong {
+           color: var(--text-color);
+        }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="quiz-header">חידון – תעשיית המזון וטכנולוגיית המזון</h1>
+    <div id="quiz-container" class="question-container">
+        <!-- Question content will be loaded here by JavaScript -->
+    </div>
+    <div class="quiz-controls">
+        <button id="view-all-btn" class="control-button">הצג את כל השאלות</button>
+        <button id="next-btn" class="control-button" style="display: none;">שאלה הבאה</button>
+    </div>
+    <div id="all-questions" class="all-questions-container">
+        <h2>כל השאלות והתשובות</h2>
+        <!-- All questions content will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "מה ההבדל העיקרי בין הכנה ביתית להכנה תעשייתית של מזון?",
+        options: [
+          "בהכנה ביתית משתמשים רק בירקות אורגניים.",
+          "בהכנה תעשייתית יש שימוש בציוד מיוחד ובטכנולוגיות מתקדמות לשמירה על איכות וחיי מדף.",
+          "בהכנה ביתית יש יותר דגש על טעם אישי.",
+          "אין הבדל משמעותי בין השתיים."
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> הכנה תעשייתית דורשת שימוש בטכנולוגיות מתקדמות וציוד מיוחד כדי לשמור על איכות המוצר, בטיחותו וחיי המדף שלו, וזאת בהתאם לתקנים ולרגולציה."
+      },
+      {
+        question: "מה המטרה העיקרית של טכנולוגיית המזון?",
+        options: [
+          "להוזיל את עלויות הייצור של מזון.",
+          "לשפר את הטעם של המזון.",
+          "להבטיח מזון בטוח, מזין ושלם, תוך התאמה לצרכים ולתקנות.",
+          "להאריך את זמן הבישול של המזון."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> טכנולוגיית המזון עוסקת בשימור, עיבוד, אריזה, הפצה ואחסון המזון, תוך הקפדה על בטיחות, תזונה והתאמה לדרישות הצרכן."
+      },
+      {
+        question: "מהו IFT?",
+        options: [
+          "שם של חברת מזון גדולה.",
+          "מכון טכנולוגי לחקר חקלאות.",
+          "Institute of Food Technologists – ארגון העוסק במדע וטכנולוגיה של מזון.",
+          "תקן איכות בינלאומי למזון."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> IFT הוא ארגון בינלאומי של טכנולוגי מזון, שמטרתו לקדם את המחקר והיישום של מדע וטכנולוגיה בתחום המזון."
+      },
+      {
+        question: "אילו תחומים משולבים במדעי המזון?",
+        options: [
+          "ביולוגיה, פיזיקה, הנדסה וכימיה.",
+          "רק ביולוגיה וכימיה.",
+          "רק פיזיקה והנדסה.",
+          "מתמטיקה וסטטיסטיקה."
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> מדעי המזון משלבים דיסציפלינות שונות כגון ביולוגיה, פיזיקה, הנדסה וכימיה, כדי להבין את טבע המזון, את תהליכי עיבודו ואת הגורמים המשפיעים על איכותו."
+      },
+      {
+        question: "מהי פחמימה?",
+        options: [
+          "שומן בלתי רווי.",
+          "חלבון מן הצומח.",
+          "תרכובת אורגנית המורכבת מסוכרים.",
+          "מינרל חיוני לגוף."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> פחמימות הן תרכובות אורגניות המבוססות על סוכרים ומספקות מקור אנרגיה עיקרי לגוף. הן מתחלקות לחד-סוכרים, דו-סוכרים ורב-סוכרים."
+      },
+      {
+        question: "מהי תגובת מייארד?",
+        options: [
+          "תגובה כימית הגורמת לקלקול מזון.",
+          "תגובה בין סוכרים לחומצות אמינו, היוצרת טעמים וצבעים.",
+          "תהליך הקפאה של מזון.",
+          "תהליך המסת סוכר במים."
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> תגובת מייארד היא תגובה כימית בין סוכרים לחומצות אמינו, אשר מתרחשת בעת חימום המזון, ומביאה ליצירת טעמים, צבעים וניחוחות אופייניים."
+      },
+      {
+        question: "מהו עמילן?",
+        options: [
+          "סוג של חלבון.",
+          "רב-סוכר המצוי בצמחים.",
+          "סוג של שומן.",
+          "ויטמין מסיס במים."
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> עמילן הוא פוליסכריד המצוי בצמחים ומשמש כמקור אנרגיה. הוא מורכב משרשראות של מולקולות גלוקוז."
+      },
+      {
+        question: "מהם סיבים תזונתיים?",
+        options: [
+          "סוג של חלבון הנמצא בבשר.",
+          "פחמימות שאינן נעכלות במעי הדק.",
+          "סוג של שומן בלתי רווי.",
+          "מינרלים הנמצאים בירקות."
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> סיבים תזונתיים הם פחמימות מורכבות שאינן מתעכלות במעי הדק, ותורמים לבריאות מערכת העיכול, ויסות רמות הסוכר והכולסטרול בדם."
+      },
+      {
+        question: "מהי דנטורציה של חלבון?",
+        options: [
+          "תהליך עיכול החלבון בקיבה.",
+          "שינוי במבנה המרחבי של החלבון, הנגרם מחום, שינויי pH או אמצעים אחרים.",
+          "תהליך יצירת חלבון חדש.",
+          "תהליך הקפאת חלבון."
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> דנטורציה היא תהליך שבו החלבון מאבד את הקיפול התלת-ממדי שלו, מה שעלול להשפיע על פעילותו הביולוגית. תהליך זה יכול להיגרם מחשיפה לחום, שינויי pH או חומרים מסוימים."
+      },
+      {
+        question: "מהם ליפידים?",
+        options: [
+          "סוכרים פשוטים.",
+          "חומצות אמינו.",
+          "שומנים ושמנים.",
+          "ויטמינים."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> ליפידים הם קבוצת מולקולות שומניות הכוללות שומנים ושמנים, והם מהווים מקור אנרגיה חשוב, כמו גם מרכיב המשפיע על מרקם המזון."
+      },
+      {
+        question: "מהם הגורמים המשפיעים על קלקול מזון?",
+        options: [
+          "רק טמפרטורה.",
+          "רק לחות.",
+          "מיקרואורגניזמים, טמפרטורה, לחות, חמצן ואנזימים.",
+          "רק אור."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> קלקול מזון נגרם משילוב גורמים כגון פעילות מיקרואורגניזמים, טמפרטורה, לחות, נוכחות חמצן ופעילות אנזימטית, המשפיעים על טעם, מרקם ובטיחות המזון."
+      },
+      {
+        question: "מהי חשיבותם של חומרי גלם איכותיים בתעשיית המזון?",
+        options: [
+          "רק להוזיל עלויות.",
+          "רק לשפר את הטעם.",
+          "להבטיח מוצר סופי איכותי, בטיחותי ומזין.",
+          "אין חשיבות מיוחדת."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> שימוש בחומרי גלם איכותיים הוא הבסיס למוצר סופי איכותי ובטיחותי. בחירה נכונה, אחסון נאות ותהליכי עיבוד תקינים מבטיחים את הערך התזונתי והבטיחותי של המזון."
+      },
+      {
+        question: "מה תפקיד האריזה בתעשיית המזון?",
+        options: [
+          "רק לשפר את מראה המוצר.",
+          "רק להוזיל עלויות הובלה.",
+          "להגן על המזון, לשמור על איכותו, לספק מידע לצרכן ולהאריך את חיי המדף.",
+          "אין תפקיד מיוחד."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> האריזה מגינה על המזון מפני נזקי הסביבה, מסייעת בשמירה על איכותו, מספקת מידע תזונתי ואלרגני לצרכן ומאריכה את חיי המדף של המוצר."
+      },
+      {
+        question: "מהם תהליכי שימור מזון?",
+        options: [
+          "רק הקפאה.",
+          "רק ייבוש.",
+          "עיקור, פסטור, הקפאה, ייבוש, תסיסה והוספת חומרים משמרים.",
+          "רק הוספת סוכר."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> תהליכי השימור כוללים מגוון שיטות (כמו עיקור, פסטור, הקפאה, ייבוש, תסיסה והוספת חומרים משמרים) שמטרתן למנוע קלקול ולהאריך את חיי המדף של המזון."
+      },
+      {
+        question: "מהי רגולציה בתעשיית המזון?",
+        options: [
+          "רק חוקים להגבלת יבוא.",
+          "רק חוקים להגבלת פרסום.",
+          "חוקים ותקנות שמטרתם להבטיח בטיחות, איכות ותזונה נכונה.",
+          "אין רגולציה בתעשיית המזון."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> רגולציה בתחום המזון כוללת חוקים ותקנות שמטרתם להגן על בריאות הציבור, להבטיח את בטיחות המזון ולוודא שהמוצרים עומדים בסטנדרטים של איכות ותזונה."
+      },
+      {
+        question: "מהי מטרתם של מבחני טעימה במוצרי מזון?",
+        options: [
+          "רק לבדוק את המראה של המוצר.",
+          "רק לבדוק את הריח של המוצר.",
+          "להעריך את הטעם, המרקם והריח ולקבל משוב מהצרכנים.",
+          "אין צורך במבחני טעימה."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> מבחני טעימה מאפשרים להעריך את תכונות המזון – טעם, מרקם וריח – וכך לשפר את המוצר ולהתאימו להעדפות הצרכנים."
+      },
+      {
+        question: "מהם תפקידיהם של מינרלים וויטמינים במזון?",
+        options: [
+          "רק לתת טעם.",
+          "רק לתת צבע.",
+          "חיוניים לתפקוד תקין של הגוף ולשמירה על הבריאות.",
+          "אין להם תפקיד חשוב."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> מינרלים וויטמינים ממלאים תפקיד מרכזי בתהליכים ביולוגיים ותורמים לשמירה על בריאות תקינה של הגוף."
+      },
+      {
+        question: "מהי חשיבות המים במזון?",
+        options: [
+          "רק לתת נפח למזון.",
+          "רק להוזיל עלויות הייצור.",
+          "משפיעים על מרקם, טעם, יציבות ופעילות מיקרוביאלית.",
+          "אין להם חשיבות רבה."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> מים מהווים מרכיב עיקרי במזון ומשפיעים על תכונותיו – כמו מרקם, טעם ויציבות – וכן על קצב גדילת המיקרואורגניזמים."
+      },
+      {
+        question: "מהי מטרת תהליך הפסטור?",
+        options: [
+          "להרוג את כל המיקרואורגניזמים במזון.",
+          "להפחית את כמות החיידקים הפתוגניים ולהאריך את חיי המדף.",
+          "להוסיף טעם למזון.",
+          "לשנות את צבע המזון."
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> פסטור הוא תהליך חימום שמטרתו להפחית את מספר החיידקים הפתוגניים במזון ולהאריך את חיי המדף, תוך שמירה על ערכים תזונתיים וטעם."
+      },
+      {
+        question: "מהי המשמעות של 'חיי מדף' של מוצר מזון?",
+        options: [
+          "התאריך שבו המוצר יוצא מהמפעל.",
+          "התקופה שבה המוצר שומר על איכותו ובטיחותו בתנאי אחסון מוגדרים.",
+          "התאריך שבו צריך לזרוק את המוצר.",
+          "אין משמעות ל'חיי מדף'."
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> 'חיי מדף' הם התקופה שבה המוצר שומר על איכותו ובטיחותו, לאחריה קיימת סכנה לאובדן הערכים התזונתיים או לסיכון בטיחותי."
+      },
+      {
+        question: "מהי מטרת תהליך העיקור (סטריליזציה) במזון?",
+        options: [
+          "רק לנקות את המזון מלכלוך.",
+          "להרוס את כל המיקרואורגניזמים, כולל נבגים.",
+          "לשפר את הטעם.",
+          "להוסיף צבע."
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> תהליך העיקור נועד להרוס את כל המיקרואורגניזמים במזון, כולל נבגים, ובכך להבטיח את בטיחותו לאורך זמן."
+      },
+      {
+        question: "מהם השיקולים המרכזיים בבחירת חומרי אריזה למזון?",
+        options: [
+          "רק מחיר האריזה.",
+          "רק מראה האריזה.",
+          "הגנה על המוצר, שמירה על איכותו, התאמה לסוג המזון, בטיחות ועלות.",
+          "רק קלות השימוש."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> בבחירת חומרי אריזה יש להתחשב בהגנה על המוצר, שמירה על איכותו, התאמה לסוג המזון, בטיחות ועלות, כדי להבטיח את איכות המזון לאורך זמן."
+      },
+      {
+        question: "מהם היתרונות של שימוש בטכנולוגיות מתקדמות בתעשיית המזון?",
+        options: [
+          "רק להוזיל עלויות.",
+          "רק לשפר את מראה המוצר.",
+          "שיפור בטיחות, איכות, יעילות הייצור, חיי מדף והתאמה לצרכים תזונתיים.",
+          "אין יתרונות מיוחדים."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> שימוש בטכנולוגיות מתקדמות תורם לשיפור בטיחות ואיכות המזון, מייעל את תהליכי הייצור, מאריך את חיי המדף ומבטיח התאמה לצרכים המשתנים של הצרכן."
+      },
+      {
+        question: "מהי חשיבות השמירה על היגיינה בתהליכי ייצור מזון?",
+        options: [
+          "רק כדי שהמפעל ייראה נקי.",
+          "רק כדי לעמוד בתקנים.",
+          "מניעת זיהומים, הבטחת בטיחות המזון ושמירה על בריאות הצרכנים.",
+          "אין חשיבות מיוחדת להיגיינה."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> שמירה על היגיינה בתהליכי ייצור היא קריטית למניעת זיהומים, הבטחת בטיחות המזון והגנה על בריאות הצרכנים."
+      },
+      {
+        question: "מה תפקיד הסוכרים בתעשיית המזון?",
+        options: [
+          "רק לתת מתיקות.",
+          "רק להוסיף קלוריות.",
+          "לשפר טעם, מרקם, צבע ושימור המזון.",
+          "רק להוזיל את המוצר."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> לסוכרים יש תפקידים רבים – מעבר למתיקות הם משפיעים על המרקם, הצבע והשימור של המזון."
+      },
+      {
+        question: "מהי רטרוגרדציה של עמילן?",
+        options: [
+          "תהליך חימום של העמילן.",
+          "תהליך הקפאת העמילן.",
+          "תהליך שבו מולקולות העמילן מסתדרות מחדש ויוצרות מבנה צפוף יותר.",
+          "תהליך המסת העמילן במים."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> רטרוגרדציה היא תהליך שבו מבנה העמילן משתנה – המולקולות מסתדרות מחדש בצורה צפופה יותר, מה שמשפיע על מרקם המזון."
+      },
+      {
+        question: "מהם הגורמים המשפיעים על יציבות של אמולסיה במזון?",
+        options: [
+          "רק טמפרטורה.",
+          "רק ערבוב.",
+          "סוג החומרים הפעילים, צמיגות, גודל טיפות ושמירה על טמפרטורה.",
+          "רק כמות המים."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> יציבות אמולסיה תלויה במאפיינים כגון סוג החומרים הפעילים (אמולסיפיירים), צמיגות, גודל טיפות ומניעת שינויים טמפרטוריים שמובילים להפרדה של הפאזות."
+      },
+      {
+        question: "מה תפקידם של אנזימים בתעשיית המזון?",
+        options: [
+          "רק לקלקל את המזון.",
+          "רק להוסיף טעם.",
+          "לשפר מרקם, טעם, ערך תזונתי ולסייע בתהליכי ייצור.",
+          "אין להם תפקיד חשוב."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> אנזימים ממלאים תפקיד מרכזי בתהליכים ביוכימיים המשפיעים על המרקם, הטעם והערך התזונתי של המזון, וכן מסייעים בתהליכי עיבוד ושיפור המוצר."
+      },
+      {
+        question: "מהם סוגי הטיפולים התרמיים הנפוצים בשימור מזון?",
+        options: [
+          "רק הקפאה.",
+          "רק ייבוש.",
+          "פסטור, עיקור וחליטה.",
+          "רק הוספת סוכר."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> טיפולים תרמיים כגון פסטור, עיקור וחליטה משמשים להקטנת כמות המיקרואורגניזמים במזון ולהארכת חיי המדף, תוך שמירה על איכותו."
+      },
+      {
+        question: "מהי המשמעות של 'פעילות מים' (Water Activity) במזון?",
+        options: [
+          "כמות המים במזון.",
+          "לחץ האדים של המים במזון.",
+          "טמפרטורת המים במזון.",
+          "צבע המים במזון."
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> 'פעילות מים' מודדת את לחץ האדים של המים במזון, מה שמשפיע על קצב גדילת המיקרואורגניזמים ויציבות המוצר."
+      },
+      {
+        question: "מהם הגורמים המשפיעים על קצב תגובות כימיות במזון?",
+        options: [
+          "רק טמפרטורה.",
+          "רק לחות.",
+          "טמפרטורה, לחות, pH, נוכחות חמצן וריכוז מגיבים.",
+          "רק צבע המזון."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> קצב התגובות הכימיות במזון תלוי במגוון גורמים כגון טמפרטורה, לחות, ערך ה-pH, נוכחות חמצן וריכוז המגיבים."
+      },
+      {
+        question: "מהי חשיבות השליטה בצמיגות של מזונות נוזליים?",
+        options: [
+          "רק כדי שהמזון ייראה טוב.",
+          "רק כדי שהמזון יהיה טעים.",
+          "משפיעה על מרקם, יציבות, תחושה בפה וקלות בליעה.",
+          "אין חשיבות מיוחדת."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> השליטה בצמיגות משפיעה על חוויית האכילה – היא קובעת את המרקם, היציבות והתחושה בפה של המזון, ומבטיחה בליעה קלה ונעימה."
+      },
+      {
+        question: "מהם היתרונות של שימוש באריזות ואקום במזון?",
+        options: [
+          "רק להוזיל עלויות.",
+          "רק לשפר את המראה של המוצר.",
+          "מניעת חמצון, עיכוב גדילת חיידקים, הארכת חיי מדף ושמירה על טריות המזון.",
+          "אין יתרונות מיוחדים."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> שימוש באריזות ואקום מסייע במניעת חמצון המזון, מעכב את גדילת החיידקים, מאריך את חיי המדף ושומר על טריות ואיכות המוצר."
+      },
+      {
+        question: "מהם השיקולים המרכזיים בפיתוח מוצרי מזון חדשים?",
+        options: [
+          "רק מחיר המוצר.",
+          "רק מראה המוצר.",
+          "צרכי הצרכנים, טעם, ערך תזונתי, בטיחות, עלות ורגולציה.",
+          "רק קלות הייצור."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> בפיתוח מוצרי מזון חדשים יש להתחשב במגוון שיקולים – העונה על צרכי הצרכן, מספק טעם וערך תזונתי, עומד בדרישות הבטיחות והרגולציה, וכל זאת תוך שקילה כלכלית של עלויות הייצור."
+      },
+      {
+        question: "מהי חשיבות התיבול (תבלינים, מלח, פלפל) בשימור מזון?",
+        options: [
+          "רק לתת טעם למזון.",
+          "רק להוסיף צבע.",
+          "חלק מהתבלינים בעלי תכונות אנטי-מיקרוביאליות, ובכך משפרים גם את הטעם והריח.",
+          "אין חשיבות מיוחדת."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> בנוסף לטעמה, תיבול המזון יכול לסייע במניעת התפתחות מיקרואורגניזמים בזכות תכונות אנטי-מיקרוביאליות מסוימות."
+      },
+      {
+        question: "מהם היתרונות של שימוש בטכניקות עיבוד מזון בלחץ גבוה?",
+        options: [
+          "רק להוזיל עלויות.",
+          "רק לשפר את מראה המוצר.",
+          "שימור ויטמינים, שמירה על טעם טבעי, עיכוב פעילות אנזימטית וקטילת חיידקים, ללא שימוש בחום גבוה.",
+          "אין יתרונות מיוחדים."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> עיבוד בלחץ גבוה מאפשר לשמור על תכולת הוויטמינים, לשמר את הטעם הטבעי ולעכב פעילות אנזימטית תוך קטילת חיידקים – כל זאת מבלי להשתמש בחום שעלול לפגוע במזון."
+      },
+      {
+        question: "מהי מטרת השימוש בחומרים מתחלבים (אמולסיפיירים) בתעשיית המזון?",
+        options: [
+          "רק להוסיף צבע.",
+          "רק להוסיף טעם.",
+          "לייצב תערובות של שמן ומים ולמנוע הפרדתן.",
+          "רק להוזיל עלויות הייצור."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> חומרים מתחלבים (אמולסיפיירים) משמשים לייצוב תערובות דו-פאזיות (שמן ומים), ובכך מונעים את הפרדתן ותורמים למרקם אחיד ויציב של המוצר."
+      },
+      {
+        question: "מהם השיקולים בבחירת זני ירקות ופירות לתעשייה?",
+        options: [
+          "רק מחיר הזן.",
+          "רק מראה הזן.",
+          "התאמה לעיבוד, עמידות למחלות, חיי מדף, טעם ומרקם.",
+          "רק קלות הגידול."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> בבחירת זני ירקות ופירות לתעשייה יש לשקלל את התאמתם לעיבוד, עמידותם למחלות, חיי המדף, הטעם והמרקם – כדי להבטיח מוצר סופי איכותי ויעילות בתהליכי הייצור."
+      },
+      {
+        question: "מהי מטרת תהליך החליטה (Blanching) בירקות?",
+        options: [
+          "רק לנקות את הירקות.",
+          "רק להוסיף טעם לירקות.",
+          "לעכב פעילות אנזימטית, לשפר את צבעם ומרקמם.",
+          "רק להוזיל עלויות הייצור."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> תהליך החליטה כולל חימום קצר של הירקות במים חמים או בקיטור, במטרה לעכב פעילות אנזימטית, לשפר את הצבע והמרקם ולהכין את הירקות לעיבוד או שימור."
+      },
+      {
+        question: "מהי חשיבות בקרת האיכות בתעשיית המזון?",
+        options: [
+          "רק כדי שהמפעל ייראה נקי.",
+          "רק כדי לעמוד בתקנים.",
+          "להבטחת מוצרים בטוחים, איכותיים ועקביים לאורך כל תהליך הייצור.",
+          "אין חשיבות מיוחדת."
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> בקרת איכות בתעשיית המזון חיונית להבטחת מוצרים בטוחים, איכותיים ועקביים, מה שמשפר את אמינות המוצר ואת שביעות רצון הצרכנים."
+      }
+    ];
+
+    let currentQuestion = 0;
+    const quizContainer = document.getElementById("quiz-container");
+    const nextButton = document.getElementById("next-btn");
+    const viewAllButton = document.getElementById("view-all-btn");
+    const allQuestionsContainer = document.getElementById("all-questions");
+
+    function loadQuestion() {
+      quizContainer.innerHTML = ""; // Clear previous question
+      nextButton.style.display = "none"; // Hide next button initially
+
+      if (currentQuestion < quizData.length) {
+        const q = quizData[currentQuestion];
+        const questionEl = document.createElement("div");
+        questionEl.className = "question-text";
+        // Display question number along with text
+        questionEl.textContent = `${currentQuestion + 1}. ${q.question}`;
+        quizContainer.appendChild(questionEl);
+
+        const optionsList = document.createElement("ul");
+        optionsList.className = "options";
+        q.options.forEach((option, index) => {
+          const li = document.createElement("li");
+          li.className = "option";
+          const btn = document.createElement("button");
+          btn.className = "option-button";
+          btn.textContent = option;
+          btn.onclick = () => selectOption(btn, index);
+          li.appendChild(btn);
+          optionsList.appendChild(li);
+        });
+        quizContainer.appendChild(optionsList);
+      } else {
+        quizContainer.innerHTML = `<h2 class="quiz-header" style="text-align:center;">סיימת את כל השאלות! כל הכבוד!</h2>`;
+        viewAllButton.style.display = 'block'; // Keep view all button visible
+        nextButton.style.display = 'none'; // Ensure next button is hidden
+      }
+    }
+
+    function selectOption(button, index) {
+      const q = quizData[currentQuestion];
+      const optionButtons = quizContainer.querySelectorAll(".option-button");
+      optionButtons.forEach(btn => btn.disabled = true); // Disable all buttons after selection
+
+      const correctIcon = '<span class="feedback-icon">✓</span>';
+      const incorrectIcon = '<span class="feedback-icon">✗</span>';
+
+      if (index === q.correctIndex) {
+        button.classList.add("correct");
+        button.innerHTML += correctIcon; // Use innerHTML to add icon
+      } else {
+        button.classList.add("incorrect");
+        button.innerHTML += incorrectIcon;
+        // Highlight the correct answer
+        optionButtons[q.correctIndex].classList.add("correct");
+        optionButtons[q.correctIndex].innerHTML += correctIcon;
+      }
+
+      // Display explanation
+      const explanation = document.createElement("div");
+      explanation.className = "explanation";
+      explanation.innerHTML = q.explanation; // Use innerHTML if explanation contains HTML like <strong>
+      quizContainer.appendChild(explanation);
+
+      // Show next button only if there are more questions
+      if (currentQuestion < quizData.length - 1) {
+           nextButton.style.display = "block";
+      } else {
+          nextButton.textContent = "סיימת!"; // Or hide it
+          nextButton.disabled = true;
+          nextButton.style.display = "block"; // Keep it visible but disabled maybe? Or hide: display = 'none';
+      }
+    }
+
+    nextButton.addEventListener("click", () => {
+        if (currentQuestion < quizData.length -1) {
+             currentQuestion++;
+             loadQuestion();
+        }
+    });
+
+    viewAllButton.addEventListener("click", () => {
+      if (allQuestionsContainer.style.display === "none" || allQuestionsContainer.style.display === "") {
+        allQuestionsContainer.style.display = "block";
+        displayAllQuestions();
+        viewAllButton.textContent = "הסתר את כל השאלות";
+      } else {
+        allQuestionsContainer.style.display = "none";
+        viewAllButton.textContent = "הצג את כל השאלות";
+      }
+    });
+
+    function displayAllQuestions() {
+      allQuestionsContainer.innerHTML = '<h2>כל השאלות והתשובות</h2>'; // Add title back
+      quizData.forEach((q, i) => {
+        const qDiv = document.createElement("div");
+        qDiv.className = "all-question";
+
+        const qTitle = document.createElement("h3");
+        qTitle.textContent = `${i + 1}. ${q.question}`;
+        qDiv.appendChild(qTitle);
+
+        const ul = document.createElement("ul");
+        q.options.forEach((option, idx) => {
+          const li = document.createElement("li");
+          li.textContent = option;
+          if (idx === q.correctIndex) {
+            li.classList.add("correct-answer");
+            li.textContent += " (נכון)"; // Indicate correct answer clearly
+          }
+          ul.appendChild(li);
+        });
+        qDiv.appendChild(ul);
+
+        const exp = document.createElement("div");
+        exp.className = "all-explanation";
+        exp.innerHTML = q.explanation; // Use innerHTML for potential formatting
+        qDiv.appendChild(exp);
+
+        allQuestionsContainer.appendChild(qDiv);
+      });
+    }
+
+    // Initial load
+    loadQuestion();
+  </script>
+</body>
+</html>

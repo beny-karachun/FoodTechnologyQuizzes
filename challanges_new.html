@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>חידון טכנולוגיית המזון – אתגרים ומגמות 2025</title>
+   <style>
+    /* PASTE THE EXACT SAME CSS RULES FROM introduction_new.html HERE */
+    :root {
+      --primary-color: #007bff; /* Blue */
+      --primary-hover-color: #0056b3;
+      --correct-color: #28a745; /* Green */
+      --correct-bg-color: #d4edda;
+      --incorrect-color: #dc3545; /* Red */
+      --incorrect-bg-color: #f8d7da;
+      --explanation-bg-color: #e2e3e5; /* Light Gray */
+      --explanation-border-color: #adb5bd;
+      --text-color: #343a40; /* Dark Gray */
+      --light-text-color: #6c757d; /* Medium Gray */
+      --background-color: #f8f9fa; /* Very Light Gray */
+      --container-bg-color: #ffffff; /* White */
+      --border-color: #dee2e6; /* Light Gray Border */
+      --button-secondary-bg: #6c757d; /* Gray for 'View All' */
+      --button-secondary-hover: #5a6268;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      direction: rtl;
+      text-align: right;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 25px;
+      background-color: var(--container-bg-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .quiz-header {
+        text-align: center;
+        margin-bottom: 25px;
+        color: var(--primary-color);
+        font-size: 1.8em;
+        font-weight: 600;
+    }
+
+    .question-container {
+      background-color: var(--container-bg-color); /* Consistent background */
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .question-text {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    /* Ensure LTR spans inside RTL text are handled visually */
+    .question-text span[dir="ltr"] {
+        display: inline-block;
+        margin: 0 0.2em;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .option {
+      margin-bottom: 12px;
+    }
+
+    button.option-button {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 1em;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background-color: var(--container-bg-color);
+      color: var(--text-color);
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+      text-align: right;
+    }
+
+    button.option-button:hover:not(:disabled) {
+      background-color: #f1f3f5; /* Lighter gray on hover */
+      border-color: #ced4da;
+    }
+
+    button.option-button:active:not(:disabled) {
+        transform: scale(0.99);
+    }
+
+    button.option-button:disabled {
+        cursor: default;
+        opacity: 0.8;
+    }
+
+    button.option-button.correct {
+      background-color: var(--correct-bg-color);
+      border-color: var(--correct-color);
+      color: var(--correct-color);
+      font-weight: 500;
+    }
+
+    button.option-button.incorrect {
+      background-color: var(--incorrect-bg-color);
+      border-color: var(--incorrect-color);
+      color: var(--incorrect-color);
+      font-weight: 500;
+    }
+
+     button.option-button .feedback-icon {
+        float: left;
+        font-weight: bold;
+        margin-left: 10px;
+     }
+
+    .explanation {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: var(--explanation-bg-color);
+      border-right: 4px solid var(--explanation-border-color); /* Right border for RTL */
+      border-radius: 4px;
+      font-size: 0.95em;
+      color: var(--light-text-color);
+    }
+    .explanation strong {
+        color: var(--text-color);
+    }
+    /* Ensure LTR math in explanations is handled */
+    .explanation span[dir="ltr"], .explanation [dir="ltr"] {
+        display: inline-block;
+        direction: ltr;
+        text-align: left;
+        margin: 0 0.2em;
+    }
+
+
+    .quiz-controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+    }
+
+    .control-button {
+      padding: 10px 25px;
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .control-button:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    #next-btn {
+      background-color: var(--primary-color);
+    }
+    #next-btn:hover {
+      background-color: var(--primary-hover-color);
+    }
+
+    #view-all-btn {
+      background-color: var(--button-secondary-bg);
+    }
+     #view-all-btn:hover {
+      background-color: var(--button-secondary-hover);
+    }
+
+    .all-questions-container {
+      display: none;
+      margin-top: 30px;
+      max-height: 500px; /* Increased height */
+      overflow-y: auto;
+      background-color: var(--container-bg-color);
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+     .all-questions-container h2 {
+        text-align: center;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+     }
+
+    .all-question {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .all-question:last-child {
+        border-bottom: none;
+    }
+
+     .all-question h3 {
+        font-size: 1.1em;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 10px;
+     }
+     .all-question ul {
+         list-style: none;
+         padding-right: 15px; /* Indentation for options */
+         margin-top: 5px;
+         margin-bottom: 10px;
+     }
+      .all-question li {
+         margin-bottom: 5px;
+         color: var(--light-text-color);
+      }
+      .all-question li.correct-answer {
+          color: var(--correct-color);
+          font-weight: 500;
+      }
+       .all-question .all-explanation {
+           font-size: 0.9em;
+           color: var(--light-text-color);
+           padding-right: 15px;
+       }
+        .all-question .all-explanation strong {
+           color: var(--text-color);
+        }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="quiz-header">חידון טכנולוגיית המזון – אתגרים ומגמות</h1>
+    <div id="quiz-container" class="question-container">
+        <!-- Question content will be loaded here by JavaScript -->
+    </div>
+    <div class="quiz-controls">
+        <button id="view-all-btn" class="control-button">הצג את כל השאלות</button>
+        <button id="next-btn" class="control-button" style="display: none;">שאלה הבאה</button>
+    </div>
+    <div id="all-questions" class="all-questions-container">
+        <h2>כל השאלות והתשובות</h2>
+        <!-- All questions content will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    // מערך האובייקטים המכיל את נתוני החידון
+    const quizData = [
+      {
+        question: "מהו התחום המדעי והמקצועי העיקרי שטכנולוגיית מזון עוסקת בו?",
+        options: [
+          "חקלאות וגידולים",
+          "הכנה, עיבוד, שימור, אריזה, אחסנה, הפצה וצריכה של מזון",
+          "שיווק ומכירות של מוצרי מזון",
+          "תזונה ודיאטה בלבד"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> טכנולוגיית מזון עוסקת בכל שרשרת הערך של המזון – מהכנה ועיבוד ועד להפצה וצריכה, והיא אינה מוגבלת רק לתחום התזונה או הגידולים."
+      },
+      {
+        question: "אילו מהבאים הם חלק מהדרישות של טכנולוגיית המזון?",
+        options: [
+          "מחיר נמוך בלבד",
+          "התאמה לצרכים, תזונה, טעם, בטיחות וחיי מדף",
+          "פרסום אגרסיבי",
+          "ייצור מהיר בלבד"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> טכנולוגיית מזון דורשת להתאים את המוצר לצרכי השוק, לספק ערכים תזונתיים, לשמור על טעם איכותי, להבטיח בטיחות ולהעניק חיי מדף מתאימים."
+      },
+      {
+        question: "מהם ה‑Mega Trends העיקריים בעולם המערבי?",
+        options: [
+          "גלובליזציה, קידמה טכנולוגית, קיימות ואיכות סביבה, בריאות ואיכות חיים, קצב חיים מהיר ומשתנה, משפחה חדשה",
+          "מחיר נמוך, ייצור המוני, פרסום אגרסיבי",
+          "חקלאות מסורתית, צריכה מקומית בלבד",
+          "שימור מזון בשיטות עתיקות"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> המגמות העולמיות (Mega Trends) כוללות תהליכים כגון גלובליזציה, התפתחות טכנולוגית, דגש על קיימות ואיכות הסביבה, בריאות, קצב חיים משתנה ושינויים במבנה המשפחתי."
+      },
+      {
+        question: "מהי המטרה של \"Local food\"?",
+        options: [
+          "לייבא מזון מחול",
+          "לחבר בין יצרני מזון לצרכנים באזור גיאוגרפי משותף",
+          "לייצר מזון זול",
+          "לייצר מזון לא טרי"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> המושג \"Local food\" מתמקד בחיבור בין יצרני המזון לבין הצרכנים באותו אזור, מה שמקדם טריות, קהילתיות ותמיכה בכלכלה המקומית."
+      },
+      {
+        question: "מהו \"Farm to Fork Approach\"?",
+        options: [
+          "שיטה להובלת מזון מהשדה למפעל בלבד",
+          "גישה הוליסטית מן השדה אל הצלחת, הכוללת את כל שלבי הייצור והצריכה",
+          "שיטה לגידול מזון אורגני בלבד",
+          "שיטה לשימור מזון בלבד"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> גישה זו מתייחסת לניהול כולל של שרשרת המזון – מהשדה ועד הצלחת, תוך הקפדה על איכות, בטיחות ושקיפות בכל שלב."
+      },
+      {
+        question: "אילו סיכונים קיימים באיכות המזון?",
+        options: [
+          "מחיר גבוה",
+          "פגיעה בתדמית, סיכוני בטיחות, תביעות משפטיות ותלונות לקוח",
+          "טעם לא טוב",
+          "אריזה לא נוחה"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> כשמדברים על איכות מזון, הסיכונים כוללים לא רק את האיכויות הפנימיות אלא גם את השפעתם על תדמית המותג, בטיחות הצרכן ותביעות משפטיות במידה ויש ליקויים."
+      },
+      {
+        question: "מהם סיכוני בטיחות המזון?",
+        options: [
+          "גופים זרים, אלרגיה וסיכונים מיקרוביאליים",
+          "מחיר גבוה",
+          "טעם לא טוב",
+          "חוסר בוויטמינים"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> סיכוני בטיחות מזון כוללים זיהומים פיזיים (כגון גופים זרים), תגובות אלרגיות וסיכונים הנובעים מהתפתחות מיקרואורגניזמים."
+      },
+      {
+        question: "מהו HACCP?",
+        options: [
+          "שיטה לשימור מזון בלבד",
+          "שיטה לניהול סיכונים וניתוח נקודות בקרה קריטיות",
+          "שיטה לגידול מזון אורגני בלבד",
+          "שיטה להפחתת מחירים"
+        ],
+        // הערה: וידוא שהאינדקס הנכון נשמר (היה 1 במקור)
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> HACCP (Hazard Analysis and Critical Control Points) היא מערכת ניהולית שמטרתה לזהות, לנתח ולשלוט בסיכונים פוטנציאליים בתהליך הייצור."
+      },
+      {
+        question: "מהי פעילות מים (aW)?",
+        options: [
+          "כמות המים במוצר",
+          "יחס לחץ אדי המים במזון ללחץ אדי מים טהורים",
+          "טמפרטורת המים במוצר",
+          "רמת החומציות במים"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> פעילות מים מייצגת את היחס בין לחץ אדי המים במזון ללחץ אדי מים טהורים, ומשפיעה על יכולת ההתפתחות של מיקרואורגניזמים."
+      },
+      {
+        question: "מה הקשר בין פעילות מים להתפתחות מיקרואורגניזמים?",
+        options: [
+          "אין קשר",
+          "פעילות מים גבוהה תומכת בהתפתחות מיקרואורגניזמים",
+          "פעילות מים נמוכה תומכת בהתפתחות מיקרואורגניזמים",
+          "פעילות מים לא משפיעה על קלקול מזון"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> ככל שהפעילות המימית גבוהה יותר, נוצרים תנאים נוחים יותר להתפתחות מיקרואורגניזמים, מה שעלול להוביל לקלקול המזון."
+      },
+      {
+        question: "אילו גורמי מחלות נגרמים על ידי חיידקים פתוגניים?",
+        options: [
+          "רק קלקול טעם",
+          "מחלות הנגרמות מהתפתחות החיידק בגוף האדם",
+          "רק שינוי צבע",
+          "רק ריח רע"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> חיידקים פתוגניים יכולים לגרום למחלות כאשר הם מתרבים בגוף האדם, מעבר להשפעה על תכונות המזון בלבד."
+      },
+      {
+        question: "מהם גורמי מחלות הנגרמים על ידי רעלן שהחיידק מפריש במזון?",
+        options: [
+          "רק שינוי מרקם",
+          "מחלות הנגרמות מרעלן (טוקסין) שהחיידק מפריש במזון",
+          "רק חוסר בוויטמינים",
+          "רק גזים"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> חיידקים מסוימים מפרישים רעלנים (טוקסינים) במזון, אשר יכולים לגרום להרעלות ואף מחלות חמורות."
+      },
+      {
+        question: "אילו סוגי קלקול מיקרוביאלי קיימים במזון?",
+        options: [
+          "רק חמיצות",
+          "עובשים, שמרים וחיידקים",
+          "רק שינוי צבע",
+          "רק טעם לוואי"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> קלקול מיקרוביאלי יכול להיגרם על ידי מגוון מיקרואורגניזמים – עובשים, שמרים וחיידקים – שכל אחד מהם משפיע על תכונות המזון בצורה שונה."
+      },
+      {
+        question: "מהם הגורמים הפיזיקליים לקלקול מזון?",
+        options: [
+          "טמפרטורה גבוהה וטמפרטורה נמוכה",
+          "רק טמפרטורה גבוהה",
+          "רק טמפרטורה נמוכה",
+          "רק חומציות"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> תנאי טמפרטורה (גם גבוהים וגם נמוכים) משפיעים על איכות המזון ועל קצב קלקולו."
+      },
+      {
+        question: "אילו תהליכי אינאקטיבציה של מיקרואורגניזמים קיימים?",
+        options: [
+          "רק קירור",
+          "חימום (פיסטור או עיקור), קרינה מייננת ולחץ גבוה",
+          "רק הקפאה",
+          "רק הוספת מלח"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> כדי להקטין או לחסל מיקרואורגניזמים, נעשה שימוש בשיטות שונות כגון חימום, קרינה ולחץ – בהתאם לסוג המזון והסיכון."
+      },
+      {
+        question: "אילו אמצעים פיזיקליים קיימים לעיכוב ומניעת התפתחות מיקרואורגניזמים?",
+        options: [
+          "רק הוספת סוכר",
+          "קירור, הקפאה, הפחתת פעילות מים (aW), ייבוש, בישול ועישון",
+          "רק הוספת חומצות אורגניות",
+          "רק שימוש בחומרים משמרים טבעיים"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> מגוון שיטות פיזיקליות – כגון קירור, הקפאה, ייבוש ובישול – מסייעות לעיכוב גדילת המיקרואורגניזמים ולהארכת חיי המדף של המזון."
+      },
+      {
+        question: "מהי שיטת המשוכות (Hurdle Effect)?",
+        options: [
+          "שיטה לשימור מזון באמצעות חומר משמר אחד בלבד",
+          "שילוב של גורמי עיכוב ליצירת \"מקבץ\" של משוכות להתפתחות מיקרוביאלית",
+          "שיטה לשימור מזון באמצעות טמפרטורה אחת בלבד",
+          "שיטה לשימור מזון באמצעות חומציות אחת בלבד"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> שיטת המשוכות משלבת מספר אמצעי עיכוב (כמו טמפרטורה, חומציות, הפחתת פעילות מים ועוד) על מנת להבטיח שמזון לא יתפתח בו מיקרואורגניזם מסוכן."
+      },
+      {
+        question: "מהם היתרונות של שיטת המשוכות?",
+        options: [
+          "רק מחיר נמוך",
+          "העצמה של כל גורם נפרד ושיפור איכות וטעם",
+          "רק ייצור מהיר",
+          "רק שימור לזמן קצר"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> השיטה מאפשרת ניצול מיטבי של כל גורם עיכוב בנפרד, מה שמוביל לשיפור כולל של איכות המזון וטעם המוצר."
+      },
+      {
+        question: "מהם המקורות של אלרגנים במזון?",
+        options: [
+          "רק חומרי גלם טריים",
+          "חומרי גלם אלרגנים, חומרי גלם מורכבים וזיהום צולב",
+          "רק תוספי מזון",
+          "רק מים"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> אלרגנים במזון יכולים להגיע מחומרי גלם שעבורם יש תגובות אלרגיות, וכן מזיהום צולב או ממקורות מורכבים במערכת הייצור."
+      },
+      {
+        question: "אילו אתגרים עומדים בפני החקיקה והתקינה בתעשיית המזון?",
+        options: [
+          "רק מחיר נמוך",
+          "תקשורת חיובית, מידע נכון ואמין לצרכן, ודרישות רגולטוריות לבטיחות המזון",
+          "רק ייצור מהיר",
+          "רק שימור לזמן קצר"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> אתגרי החקיקה כוללים את הצורך לספק לצרכן מידע אמין, להבטיח בטיחות המזון ולעמוד בדרישות רגולטוריות מחמירות."
+      },
+      {
+        question: "אילו גופים אחראים על פיקוח ואכיפה בתחום בטיחות המזון?",
+        options: [
+          "רק החברות עצמן",
+          "משרד הבריאות, רשויות מקומיות ומשרד החקלאות",
+          "רק הצרכנים",
+          "רק בתי המשפט"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> פיקוח ואכיפה בתחום בטיחות המזון נעשים בשיתוף פעולה בין משרד הבריאות, הרשויות המקומיות ומשרד החקלאות."
+      },
+      {
+        question: "מהן תקנות בריאות הציבור (מזון) (סימון) 1935?",
+        options: [
+          "תקנות העוסקות רק באיכות המזון",
+          "תקנות העוסקות בסימון מזון",
+          "תקנות העוסקות רק במחיר המזון",
+          "תקנות העוסקות רק בייצור המזון"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> תקנות אלו מתמקדות בסימון המזון, במטרה להבטיח שהצרכן יקבל מידע ברור ומדויק על המוצר."
+      },
+      {
+        question: "מה אוסר חוק הגנת הצרכן (1981)?",
+        options: [
+          "איסור ייצור מזון",
+          "איסור ייחוס סגולות רפואיות למזון",
+          "איסור מכירת מזון",
+          "איסור אכילת מזון"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> החוק אוסר על ייחוס סגולות רפואיות למזון, מה שמגן על הצרכן מפני הטעיות בנוגע ליכולתו הבריאותית של המוצר."
+      },
+      {
+        question: "מהי תקנת תנאי ייצור נאותים (GMP) (1993)?",
+        options: [
+          "תקנה העוסקת רק בסימון מזון",
+          "תקנה העוסקת בתנאי ייצור נאותים",
+          "תקנה העוסקת רק במחיר המזון",
+          "תקנה העוסקת רק בשיווק המזון"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> תקנת GMP קובעת את הדרישות לסניטציה, היגיינה וניקיון בתהליכי הייצור, מה שמבטיח איכות ובטיחות המוצר."
+      },
+      {
+        question: "מה כולל תקן ישראלי 1145 י\"ת?",
+        options: [
+          "רק מחיר המזון",
+          "סימון מזון ארוז מראש",
+          "רק טעם המזון",
+          "רק צבע המזון"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> תקן זה מתמקד בדרישות לסימון מזון ארוז מראש, תוך מתן דגש על שקיפות והעברת מידע לצרכן."
+      },
+      {
+        question: "מה כולל תקן ישראלי 1118 י\"ת חלק 1?",
+        options: [
+          "רק משקל המזון",
+          "תכולה אחידה של מוצרי מזון ארוזים מראש – כללי",
+          "רק צורת המזון",
+          "רק ריח המזון"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> תקן זה קובע את הדרישות לתכולה אחידה במוצרי מזון ארוזים מראש, כדי להבטיח אחידות ואמינות במידע."
+      },
+      {
+        question: "מהן הדרישות המיקרוביאליות למזון תינוקות לפי תקן ישראלי 2202/1-2 י\"ת?",
+        options: [
+          "רק טמפרטורת המזון",
+          "דרישות מיקרוביאליות למזון תינוקות ולמוצרים מוכנים לאכילה",
+          "רק צבע המזון",
+          "רק מרקם המזון"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> תקן זה מגדיר את הקריטריונים המיקרוביאליים הדרושים לשמירה על בטיחות מזון התינוקות והמוצרים המיועדים לאכילה."
+      },
+      {
+        question: "מה עוסק תקן ישראלי 1291 י\"ת?",
+        options: [
+          "רק אריזת המזון",
+          "רכב להובלת מזון בטמפרטורה מבוקרת",
+          "רק ייצור המזון",
+          "רק שיווק המזון"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> התקן עוסק בדרישות לגבי כלי רכב להובלת מזון בתנאים מבוקרים, מה שמבטיח שמירה על איכות ובטיחות המזון במהלך ההפצה."
+      },
+      {
+        question: "מהם רכיבי המיונז האמיתי?",
+        options: [
+          "רק שמן ומים",
+          "סוכר, מלח, חומץ, ביצים, מים ושמן",
+          "רק חומץ וביצים",
+          "רק מים וסוכר"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> מתכון המיונז האמיתי כולל שילוב מאוזן של רכיבים אשר תורמים ליצירת מרקם וטעם אחיד – סוכר, מלח, חומץ, ביצים, מים ושמן."
+      },
+      {
+        question: "מדוע מיונז תעשייתי בטוח לשימוש?",
+        options: [
+          "רק בגלל הטעם",
+          "בגלל ההרכב והתנאים המיקרוביאליים המבוקרים",
+          "רק בגלל המחיר",
+          "רק בגלל האריזה"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> בטיחות המיונז התעשייתי נובעת מהקפדה על הרכב מוקפד ותהליכי ייצור שבאמצעותם נשמרת הבקרה המיקרוביאלית."
+      },
+      {
+        question: "מהו אחוז השמן במיונז אמיתי?",
+        options: [
+          "10%",
+          "70% לפחות",
+          "30%",
+          "90%"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> במיונז אמיתי, אחוז השמן צריך להיות 70% לפחות – מה שמעניק לו את המרקם והיציבות הדרושים."
+      },
+      {
+        question: "מהם רכיבי המיונז \"קל\"?",
+        options: [
+          "רק מים ושמן",
+          "מים, שמן, ביצים, חומץ, מלח, סוכר, עמילן מעובד וחומר משמר (חומצה סורבית)",
+          "רק ביצים וחומץ",
+          "רק סוכר ומלח"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> מיונז \"קל\" מתאפיין בהרכב שונה – עם אחוז שמן נמוך יותר ותוספת רכיבים כמו עמילן וחומר משמר, מה שמפחית את הערך הקלורי מבלי לפגוע בטעם."
+      },
+      {
+        question: "מהו אחוז השמן במיונז \"קל\"?",
+        options: [
+          "70%",
+          "20%–30%",
+          "50%",
+          "90%"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> מיונז \"קל\" מתאפיין בתכולת שמן נמוכה (20%–30%), מה שמעניק לו ערך קלורי נמוך יותר לעומת המיונז הרגיל."
+      },
+      {
+        question: "מהי הסכנה העיקרית במיונז ביתי?",
+        options: [
+          "רק מחיר גבוה",
+          "מקרים לא מעטים של הרעלות מזון",
+          "טעם לא טוב",
+          "קושי בהכנה"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> מיונז ביתי עלול להיות מסוכן כאשר אינם נשמרים תנאים היגייניים נאותים – דבר הגורם להרעלות מזון במקרים רבים."
+      },
+      {
+        question: "מהם האתגרים העיקריים של תעשיית המזון?",
+        options: [
+          "רק מחיר נמוך",
+          "התאמה לצרכים, תזונה, בטיחות, חיי מדף, איכות, תקנות, ציפיות צרכן ומיצוב תחרותי",
+          "רק ייצור מהיר",
+          "רק שימור לזמן קצר"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> אתגרי תעשיית המזון כוללים מגוון רחב של דרישות – מהבטחת איכות ובטיחות, דרך עמידה בתקנות ועד להתאמה לציפיות הצרכן והמצב התחרותי בשוק."
+      },
+      {
+        question: "מה המשמעות של קיימות (Sustainability) בתעשיית המזון?",
+        options: [
+          "רק שימוש בחומרים יקרים",
+          "שמירה על איכות הסביבה ומשאבי הטבע",
+          "רק ייצור מהיר",
+          "רק שימוש בחומרים משמרים"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> קיימות מתמקדת בשמירה על הסביבה ובניהול יעיל של משאבי הטבע, כך שהייצור והצריכה של מזון יהיו אחראיים לטווח הארוך."
+      },
+      {
+        question: "מהי מטרת הסימון התזונתי על מוצרי מזון?",
+        options: [
+          "להטעות את הצרכן",
+          "לספק לצרכן מידע תזונתי נכון ואמין",
+          "להסתיר מידע מהצרכן",
+          "להגדיל את המכירות"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> סימון תזונתי נועד להעביר לצרכן מידע אמין על ערכים תזונתיים של המזון, מה שמסייע לבחירה מושכלת ובריאה."
+      },
+      {
+        question: "מהי החשיבות של ניהול איכות כוללת בשרשרת המזון?",
+        options: [
+          "רק להוזיל עלויות",
+          "להבטיח שהמוצר בטוח לצריכה ועומד בסטנדרטים המצופים",
+          "רק להגדיל את הרווחים",
+          "רק לייצר מהר יותר"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> ניהול איכות מקיף מבטיח שהמוצר המוגמר יהיה בטוח, איכותי ועונה על התקנים הנדרשים – מה שמגן על בריאות הצרכן ומשפר את המוניטין של החברה."
+      },
+      {
+        question: "אילו שינויים כימיים עלולים להתרחש במזון הגורמים לקלקול?",
+        options: [
+          "רק שינוי בצבע",
+          "חימצון, ריאקצית מיירד והידרוליזה",
+          "רק שינוי במרקם",
+          "רק שינוי בריח"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> במזון מתרחשים תהליכים כימיים כגון חימצון, ריאקצית מיירד והידרוליזה, אשר יכולים לשנות את מרקמו, טעמו ומראהו, ובכך לגרום לקלקול."
+      },
+      {
+        question: "מהם תנאי הייצור הנאותים (GMP)?",
+        options: [
+          "רק שימוש בחומרי גלם יקרים",
+          "תנאי סניטציה, היגיינה וניקיון נאותים",
+          "רק ייצור מהיר",
+          "רק שימוש בחומרים משמרים"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> GMP מתייחס לסטנדרטים של ניקיון, היגיינה ותהליכי ייצור שמבטיחים את בטיחות ואיכות המזון המיוצר."
+      }
+    ];
+
+
+    // PASTE THE EXACT SAME JAVASCRIPT CODE FROM introduction_new.html HERE
+     let currentQuestion = 0;
+    const quizContainer = document.getElementById("quiz-container");
+    const nextButton = document.getElementById("next-btn");
+    const viewAllButton = document.getElementById("view-all-btn");
+    const allQuestionsContainer = document.getElementById("all-questions");
+
+    function loadQuestion() {
+      quizContainer.innerHTML = ""; // Clear previous question
+      nextButton.style.display = "none"; // Hide next button initially
+
+      if (currentQuestion < quizData.length) {
+        const q = quizData[currentQuestion];
+        const questionEl = document.createElement("div");
+        questionEl.className = "question-text";
+        // Display question number along with text
+        questionEl.textContent = `${currentQuestion + 1}. ${q.question}`;
+        quizContainer.appendChild(questionEl);
+
+        const optionsList = document.createElement("ul");
+        optionsList.className = "options";
+        q.options.forEach((option, index) => {
+          const li = document.createElement("li");
+          li.className = "option";
+          const btn = document.createElement("button");
+          btn.className = "option-button";
+          btn.textContent = option;
+          btn.onclick = () => selectOption(btn, index);
+          li.appendChild(btn);
+          optionsList.appendChild(li);
+        });
+        quizContainer.appendChild(optionsList);
+      } else {
+        quizContainer.innerHTML = `<h2 class="quiz-header" style="text-align:center;">סיימת את כל השאלות! כל הכבוד!</h2>`;
+        viewAllButton.style.display = 'block'; // Keep view all button visible
+        nextButton.style.display = 'none'; // Ensure next button is hidden
+      }
+    }
+
+    function selectOption(button, index) {
+      const q = quizData[currentQuestion];
+      const optionButtons = quizContainer.querySelectorAll(".option-button");
+      optionButtons.forEach(btn => btn.disabled = true); // Disable all buttons after selection
+
+      const correctIcon = '<span class="feedback-icon">✓</span>';
+      const incorrectIcon = '<span class="feedback-icon">✗</span>';
+
+      if (index === q.correctIndex) {
+        button.classList.add("correct");
+        button.innerHTML += correctIcon; // Use innerHTML to add icon
+      } else {
+        button.classList.add("incorrect");
+        button.innerHTML += incorrectIcon;
+        // Highlight the correct answer
+        optionButtons[q.correctIndex].classList.add("correct");
+        optionButtons[q.correctIndex].innerHTML += correctIcon;
+      }
+
+      // Display explanation
+      const explanation = document.createElement("div");
+      explanation.className = "explanation";
+      explanation.innerHTML = q.explanation; // Use innerHTML if explanation contains HTML like <strong>
+      quizContainer.appendChild(explanation);
+
+      // Show next button only if there are more questions
+      if (currentQuestion < quizData.length - 1) {
+           nextButton.style.display = "block";
+      } else {
+          nextButton.textContent = "סיימת!"; // Or hide it
+          nextButton.disabled = true;
+          nextButton.style.display = "block"; // Keep it visible but disabled maybe? Or hide: display = 'none';
+      }
+    }
+
+    nextButton.addEventListener("click", () => {
+        if (currentQuestion < quizData.length -1) {
+             currentQuestion++;
+             loadQuestion();
+        }
+    });
+
+    viewAllButton.addEventListener("click", () => {
+      if (allQuestionsContainer.style.display === "none" || allQuestionsContainer.style.display === "") {
+        allQuestionsContainer.style.display = "block";
+        displayAllQuestions();
+        viewAllButton.textContent = "הסתר את כל השאלות";
+      } else {
+        allQuestionsContainer.style.display = "none";
+        viewAllButton.textContent = "הצג את כל השאלות";
+      }
+    });
+
+    function displayAllQuestions() {
+      allQuestionsContainer.innerHTML = '<h2>כל השאלות והתשובות</h2>'; // Add title back
+      quizData.forEach((q, i) => {
+        const qDiv = document.createElement("div");
+        qDiv.className = "all-question";
+
+        const qTitle = document.createElement("h3");
+        qTitle.textContent = `${i + 1}. ${q.question}`;
+        qDiv.appendChild(qTitle);
+
+        const ul = document.createElement("ul");
+        q.options.forEach((option, idx) => {
+          const li = document.createElement("li");
+          li.textContent = option;
+          if (idx === q.correctIndex) {
+            li.classList.add("correct-answer");
+            li.textContent += " (נכון)"; // Indicate correct answer clearly
+          }
+          ul.appendChild(li);
+        });
+        qDiv.appendChild(ul);
+
+        const exp = document.createElement("div");
+        exp.className = "all-explanation";
+        exp.innerHTML = q.explanation; // Use innerHTML for potential formatting
+        qDiv.appendChild(exp);
+
+        allQuestionsContainer.appendChild(qDiv);
+      });
+    }
+
+    // Initial load
+    loadQuestion();
+  </script>
+</body>
+</html>

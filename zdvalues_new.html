@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>חידון – בעיות ערכי Z/D</title>
+  <style>
+    /* PASTE THE EXACT SAME CSS RULES FROM introduction_new.html HERE */
+    :root {
+      --primary-color: #007bff; /* Blue */
+      --primary-hover-color: #0056b3;
+      --correct-color: #28a745; /* Green */
+      --correct-bg-color: #d4edda;
+      --incorrect-color: #dc3545; /* Red */
+      --incorrect-bg-color: #f8d7da;
+      --explanation-bg-color: #e2e3e5; /* Light Gray */
+      --explanation-border-color: #adb5bd;
+      --text-color: #343a40; /* Dark Gray */
+      --light-text-color: #6c757d; /* Medium Gray */
+      --background-color: #f8f9fa; /* Very Light Gray */
+      --container-bg-color: #ffffff; /* White */
+      --border-color: #dee2e6; /* Light Gray Border */
+      --button-secondary-bg: #6c757d; /* Gray for 'View All' */
+      --button-secondary-hover: #5a6268;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      direction: rtl;
+      text-align: right;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 25px;
+      background-color: var(--container-bg-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .quiz-header {
+        text-align: center;
+        margin-bottom: 25px;
+        color: var(--primary-color);
+        font-size: 1.8em;
+        font-weight: 600;
+    }
+
+    .question-container {
+      background-color: var(--container-bg-color); /* Consistent background */
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .question-text {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    /* Ensure LTR spans inside RTL text are handled visually */
+    .question-text span[dir="ltr"] {
+        display: inline-block;
+        margin: 0 0.2em;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .option {
+      margin-bottom: 12px;
+    }
+
+    button.option-button {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 1em;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background-color: var(--container-bg-color);
+      color: var(--text-color);
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+      text-align: right;
+    }
+
+    button.option-button:hover:not(:disabled) {
+      background-color: #f1f3f5; /* Lighter gray on hover */
+      border-color: #ced4da;
+    }
+
+    button.option-button:active:not(:disabled) {
+        transform: scale(0.99);
+    }
+
+    button.option-button:disabled {
+        cursor: default;
+        opacity: 0.8;
+    }
+
+    button.option-button.correct {
+      background-color: var(--correct-bg-color);
+      border-color: var(--correct-color);
+      color: var(--correct-color);
+      font-weight: 500;
+    }
+
+    button.option-button.incorrect {
+      background-color: var(--incorrect-bg-color);
+      border-color: var(--incorrect-color);
+      color: var(--incorrect-color);
+      font-weight: 500;
+    }
+
+     button.option-button .feedback-icon {
+        float: left;
+        font-weight: bold;
+        margin-left: 10px;
+     }
+
+    .explanation {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: var(--explanation-bg-color);
+      border-right: 4px solid var(--explanation-border-color); /* Right border for RTL */
+      border-radius: 4px;
+      font-size: 0.95em;
+      color: var(--light-text-color);
+    }
+    .explanation strong {
+        color: var(--text-color);
+    }
+    /* Ensure LTR math in explanations is handled */
+    .explanation span[dir="ltr"], .explanation [dir="ltr"] {
+        display: inline-block;
+        direction: ltr;
+        text-align: left;
+        margin: 0 0.2em;
+    }
+
+
+    .quiz-controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+    }
+
+    .control-button {
+      padding: 10px 25px;
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .control-button:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    #next-btn {
+      background-color: var(--primary-color);
+    }
+    #next-btn:hover {
+      background-color: var(--primary-hover-color);
+    }
+
+    #view-all-btn {
+      background-color: var(--button-secondary-bg);
+    }
+     #view-all-btn:hover {
+      background-color: var(--button-secondary-hover);
+    }
+
+    .all-questions-container {
+      display: none;
+      margin-top: 30px;
+      max-height: 500px; /* Increased height */
+      overflow-y: auto;
+      background-color: var(--container-bg-color);
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+     .all-questions-container h2 {
+        text-align: center;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+     }
+
+    .all-question {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .all-question:last-child {
+        border-bottom: none;
+    }
+
+     .all-question h3 {
+        font-size: 1.1em;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 10px;
+     }
+     .all-question ul {
+         list-style: none;
+         padding-right: 15px; /* Indentation for options */
+         margin-top: 5px;
+         margin-bottom: 10px;
+     }
+      .all-question li {
+         margin-bottom: 5px;
+         color: var(--light-text-color);
+      }
+      .all-question li.correct-answer {
+          color: var(--correct-color);
+          font-weight: 500;
+      }
+       .all-question .all-explanation {
+           font-size: 0.9em;
+           color: var(--light-text-color);
+           padding-right: 15px;
+       }
+        .all-question .all-explanation strong {
+           color: var(--text-color);
+        }
+  </style>
+</head>
+<body>
+   <div class="container">
+    <h1 class="quiz-header">חידון – בעיות ערכי Z/D</h1>
+    <div id="quiz-container" class="question-container">
+        <!-- Question content will be loaded here by JavaScript -->
+    </div>
+    <div class="quiz-controls">
+        <button id="view-all-btn" class="control-button">הצג את כל השאלות</button>
+        <button id="next-btn" class="control-button" style="display: none;">שאלה הבאה</button>
+    </div>
+    <div id="all-questions" class="all-questions-container">
+        <h2>כל השאלות והתשובות</h2>
+        <!-- All questions content will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    // Renamed 'questions' to 'quizData' for consistency
+    const quizData = [
+       {
+        question: "תהליך פסטור של חלב מתבצע ב־<span dir='ltr'>72°C</span>. אם ערך ה‑D של <span dir='ltr'>Listeria monocytogenes</span> בטמפרטורה זו הוא 15 שניות, כמה זמן נדרש להפחתה של 3 סדר גודל?",
+        options: ["5 שניות", "15 שניות", "45 שניות", "135 שניות"],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> הפחתה של 3 סדר גודל = <span dir='ltr'>3 × 15</span> שניות = 45 שניות."
+      },
+      {
+        question: "חיידק מסוים בעל ערך D של 2 דקות ב־<span dir='ltr'>121°C</span>. אם הטמפרטורה עולה ל־<span dir='ltr'>127°C</span> וערך ה‑Z הוא <span dir='ltr'>6°C</span>, מה יהיה ערך ה‑D החדש ב־<span dir='ltr'>127°C</span>?",
+        options: ["0.2 דקות", "1 דקה", "4 דקות", "8 דקות"],
+        correctIndex: 0, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <span dir='ltr'>log(D₂ / 2) = (121 - 127) / 6 = -1 ⟹ D₂ = 2 × 10⁻¹ = 0.2</span> דקות."
+      },
+      {
+        question: "חיידק <span dir='ltr'>E. coli</span> במיץ תפוחים בטמפרטורה של <span dir='ltr'>65°C</span> בעל ערך D של 1.0 דקות. אם נדרש להשיג הפחתה של 5 סדר גודל, כמה זמן פסטור נדרש?",
+        options: ["1 דקה", "5 דקות", "6 דקות", "10 דקות"],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <span dir='ltr'>5 × 1.0</span> דקות = 5 דקות."
+      },
+      {
+        question: "תהליך פסטור מתבצע ב־<span dir='ltr'>90°C</span>, כאשר ערך ה‑D הוא 2 דקות וערך ה‑Z הוא <span dir='ltr'>10°C</span>. מה יהיה ערך ה‑D ב־<span dir='ltr'>100°C</span>?",
+        options: ["0.2 דקות", "1 דקה", "2 דקות", "20 דקות"],
+        correctIndex: 0, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <span dir='ltr'>log(D₂ / 2) = (90 - 100) / 10 = -1 ⟹ D₂ = 2 × 10⁻¹ = 0.2</span> דקות."
+      },
+      {
+        // Note: Corrected calculation in explanation based on original HTML comment
+        question: "בתהליך עיקור עם F₀ = 10 דקות ו‑Z = <span dir='ltr'>10°C</span>, מהו זמן העיקור השווה (Equivalent Sterilization Time) ב־<span dir='ltr'>111.1°C</span> אם טמפרטורת הייחוס היא <span dir='ltr'>121.1°C</span>?",
+        options: ["100 דקות", "10 דקות", "1 דקה", "0.1 דקות"],
+        correctIndex: 0, // Corrected index based on calculation: FT = F₀ * 10^((Tref - T)/Z) = 10 * 10^((121.1 - 111.1)/10) = 10 * 10^1 = 100 min
+        explanation: "<strong>הסבר:</strong> זמן העיקור השווה (F<sub dir='ltr'>T</sub>) מחושב לפי: <span dir='ltr'>F<sub dir='ltr'>T</sub> = F₀ × 10<sup>(T<sub dir='ltr'>ref</sub> - T) / Z</sup></span>. במקרה זה: <span dir='ltr'>F<sub dir='ltr'>T</sub> = 10 × 10<sup>(121.1 - 111.1) / 10</sup> = 10 × 10<sup>10 / 10</sup> = 10 × 10¹ = 100</span> דקות. (הערה: השאלה המקורית הניחה בטעות חישוב הפוך, תשובה זו מתוקנת לפי הנוסחה הנכונה)."
+      },
+      {
+        question: "בטמפרטורה של <span dir='ltr'>115°C</span>, ערך ה‑D של Clostridium botulinum הוא 0.25 דקות. אם נדרש הפחתה של 12D, מהו זמן העיקור הנדרש?",
+        options: ["0.25 דקות", "3 דקות", "30 דקות", "48 דקות"],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <span dir='ltr'>12 × 0.25</span> דקות = 3 דקות."
+      },
+      {
+        question: "אם ערך ה‑Z הוא <span dir='ltr'>8°C</span>, בכמה מעלות יש להעלות את הטמפרטורה כדי להקטין את ערך ה‑D פי 10 (כלומר, להפחית ב־1 סדר גודל)?",
+        options: ["0.8°C", "8°C", "10°C", "80°C"],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ערך ה‑Z הוא השינוי בטמפרטורה הדרוש לשינוי D בסדר גודל אחד (פי 10), לכן התשובה היא <span dir='ltr'>8°C</span>."
+      },
+      {
+        question: "שמרים במיץ פירות בטמפרטורה של <span dir='ltr'>60°C</span> בעלי ערך D של 2 דקות. אם יש להפחית את האוכלוסייה מ־<span dir='ltr'>10⁴ CFU/mL</span> לפחות מ־<span dir='ltr'>1 CFU/mL</span> (הפחתה של 4 סדר גודל), כמה זמן פסטור נדרש?",
+        options: ["6 דקות", "8 דקות", "10 דקות", "12 דקות"],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> הפחתה של 4 סדרי גודל דורשת <span dir='ltr'>4 × D = 4 × 2</span> דקות = 8 דקות."
+      },
+      {
+        question: "לאנזים מסוים, ערך ה‑Z הוא <span dir='ltr'>10°C</span>. אם קצב האינאקטיבציה צריך לגדול פי 100, מהו השינוי הדרוש בטמפרטורה?",
+        options: ["1°C", "10°C", "20°C", "100°C"],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> הגדלת קצב האינאקטיבציה פי 100 שקולה להקטנת הזמן הנדרש (D) פי 100, שזה 2 סדרי גודל. לכן, השינוי בטמפרטורה הוא <span dir='ltr'>2 × Z = 2 × 10°C = 20°C</span>."
+      },
+      {
+        question: "תהליך פסטור מתוכנן להשגת הפחתה של 6D עבור Salmonella. אם ב־<span dir='ltr'>68°C</span> ערך ה‑D הוא 0.5 דקות ו‑Z = <span dir='ltr'>5°C</span>, מהו זמן החשיפה ב־<span dir='ltr'>73°C</span> להשגת אותה הפחתה (6D)?",
+        options: ["3 דקות", "0.3 דקות", "0.03 דקות", "0.003 דקות"],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ראשית, נמצא את D ב-73°C: <span dir='ltr'>log(D<sub dir='ltr'>73</sub> / 0.5) = (68 - 73) / 5 = -1</span>. לכן, <span dir='ltr'>D<sub dir='ltr'>73</sub> = 0.5 × 10⁻¹ = 0.05</span> דקות. זמן החשיפה הנדרש ל-6D הוא <span dir='ltr'>6 × D<sub dir='ltr'>73</sub> = 6 × 0.05 = 0.3</span> דקות."
+      },
+      {
+        question: "תהליך חימום ב-UHT מתבצע ב‑<span dir='ltr'>140°C</span>. אם ערך ה‑D עבור חיידק מסוים ב‑<span dir='ltr'>140°C</span> הוא 0.05 דקות, כמה זמן נדרש להפחתה של 4 סדר גודל?",
+        options: ["0.1 דקות", "0.2 דקות", "0.25 דקות", "0.3 דקות"],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <span dir='ltr'>4 × 0.05</span> דקות = 0.2 דקות."
+      },
+      {
+        question: "חיידק בעל ערך D של 1.5 דקות ב‑<span dir='ltr'>115°C</span> עובר חימום ל‑<span dir='ltr'>120°C</span>. אם ערך ה‑Z הוא <span dir='ltr'>7°C</span>, מהו ערך ה‑D ב‑<span dir='ltr'>120°C</span> (בקירוב)?",
+        options: ["0.3 דקות", "0.5 דקות", "1.5 דקות", "2.0 דקות"],
+        correctIndex: 0, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <span dir='ltr'>log(D<sub dir='ltr'>120</sub> / 1.5) = (115 - 120) / 7 ≈ -0.714</span>. לכן, <span dir='ltr'>D<sub dir='ltr'>120</sub> ≈ 1.5 × 10<sup>-0.714</sup> ≈ 1.5 × 0.193 ≈ 0.29</span> דקות. התשובה הקרובה ביותר היא 0.3 דקות."
+      },
+      {
+        // Note: Corrected calculation in explanation based on original HTML comment, assuming question asks for equivalent time at 131.1C for F0=10 at 121.1C
+        question: "בתהליך עיקור, אם F₀ = 10 דקות (ב-<span dir='ltr'>121.1°C</span>), מהו זמן העיקור השווה ב‑<span dir='ltr'>131.1°C</span> כאשר Z = <span dir='ltr'>10°C</span>?",
+        options: ["1 דקה", "10 דקות", "50 דקות", "100 דקות"],
+        correctIndex: 0, // Corrected index based on calculation: FT = F₀ * 10^((Tref - T)/Z) = 10 * 10^((121.1 - 131.1)/10) = 10 * 10^-1 = 1 min
+        explanation: "<strong>הסבר:</strong> זמן העיקור השווה (F<sub dir='ltr'>T</sub>) מחושב לפי: <span dir='ltr'>F<sub dir='ltr'>T</sub> = F₀ × 10<sup>(T<sub dir='ltr'>ref</sub> - T) / Z</sup></span>. במקרה זה: <span dir='ltr'>F<sub dir='ltr'>T</sub> = 10 × 10<sup>(121.1 - 131.1) / 10</sup> = 10 × 10<sup>-10 / 10</sup> = 10 × 10⁻¹ = 1</span> דקה."
+      },
+      {
+        question: "חיידק מסוים בעל ערך D של 3 דקות ב‑<span dir='ltr'>100°C</span>. אם הטמפרטורה יורדת ל‑<span dir='ltr'>95°C</span> ו‑Z = <span dir='ltr'>5°C</span>, מה יהיה ערך ה‑D ב‑<span dir='ltr'>95°C</span>?",
+        options: ["3 דקות", "6 דקות", "30 דקות", "60 דקות"],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <span dir='ltr'>log(D<sub dir='ltr'>95</sub> / 3) = (100 - 95) / 5 = 1</span>. לכן, <span dir='ltr'>D<sub dir='ltr'>95</sub> = 3 × 10¹ = 30</span> דקות."
+      },
+      {
+        question: "בתהליך פסטור, אם ערך ה‑D של חיידק מסוים ב‑<span dir='ltr'>110°C</span> הוא 1.2 דקות, כמה זמן נדרש להשגת הפחתה של 7 סדר גודל?",
+        options: ["7.2 דקות", "8.4 דקות", "10.2 דקות", "12 דקות"],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <span dir='ltr'>7 × 1.2</span> דקות = 8.4 דקות."
+      }
+    ];
+
+
+    // PASTE THE EXACT SAME JAVASCRIPT CODE FROM introduction_new.html HERE
+    // Modified loadQuestion slightly to use innerHTML for question text
+     let currentQuestion = 0;
+    const quizContainer = document.getElementById("quiz-container");
+    const nextButton = document.getElementById("next-btn");
+    const viewAllButton = document.getElementById("view-all-btn");
+    const allQuestionsContainer = document.getElementById("all-questions");
+
+    function loadQuestion() {
+      quizContainer.innerHTML = ""; // Clear previous question
+      nextButton.style.display = "none"; // Hide next button initially
+
+      if (currentQuestion < quizData.length) {
+        const q = quizData[currentQuestion];
+        const questionEl = document.createElement("div");
+        questionEl.className = "question-text";
+        // Use innerHTML to render spans correctly
+        questionEl.innerHTML = `${currentQuestion + 1}. ${q.question}`;
+        quizContainer.appendChild(questionEl);
+
+        const optionsList = document.createElement("ul");
+        optionsList.className = "options";
+        q.options.forEach((option, index) => {
+          const li = document.createElement("li");
+          li.className = "option";
+          const btn = document.createElement("button");
+          btn.className = "option-button";
+          // Use innerHTML for options too, in case they contain HTML
+          btn.innerHTML = option;
+          btn.onclick = () => selectOption(btn, index);
+          li.appendChild(btn);
+          optionsList.appendChild(li);
+        });
+        quizContainer.appendChild(optionsList);
+      } else {
+        quizContainer.innerHTML = `<h2 class="quiz-header" style="text-align:center;">סיימת את כל השאלות! כל הכבוד!</h2>`;
+        viewAllButton.style.display = 'block'; // Keep view all button visible
+        nextButton.style.display = 'none'; // Ensure next button is hidden
+      }
+    }
+
+    function selectOption(button, index) {
+      const q = quizData[currentQuestion];
+      const optionButtons = quizContainer.querySelectorAll(".option-button");
+      optionButtons.forEach(btn => btn.disabled = true); // Disable all buttons after selection
+
+      const correctIcon = '<span class="feedback-icon">✓</span>';
+      const incorrectIcon = '<span class="feedback-icon">✗</span>';
+
+      if (index === q.correctIndex) {
+        button.classList.add("correct");
+        button.innerHTML += correctIcon; // Use innerHTML to add icon
+      } else {
+        button.classList.add("incorrect");
+        button.innerHTML += incorrectIcon;
+        // Highlight the correct answer
+        optionButtons[q.correctIndex].classList.add("correct");
+        optionButtons[q.correctIndex].innerHTML += correctIcon;
+      }
+
+      // Display explanation
+      const explanation = document.createElement("div");
+      explanation.className = "explanation";
+      explanation.innerHTML = q.explanation; // Use innerHTML if explanation contains HTML like <strong> or <span>
+      quizContainer.appendChild(explanation);
+
+      // Show next button only if there are more questions
+      if (currentQuestion < quizData.length - 1) {
+           nextButton.style.display = "block";
+      } else {
+          nextButton.textContent = "סיימת!"; // Or hide it
+          nextButton.disabled = true;
+          nextButton.style.display = "block"; // Keep it visible but disabled maybe? Or hide: display = 'none';
+      }
+    }
+
+    nextButton.addEventListener("click", () => {
+        if (currentQuestion < quizData.length -1) {
+             currentQuestion++;
+             loadQuestion();
+        }
+    });
+
+    viewAllButton.addEventListener("click", () => {
+      if (allQuestionsContainer.style.display === "none" || allQuestionsContainer.style.display === "") {
+        allQuestionsContainer.style.display = "block";
+        displayAllQuestions();
+        viewAllButton.textContent = "הסתר את כל השאלות";
+      } else {
+        allQuestionsContainer.style.display = "none";
+        viewAllButton.textContent = "הצג את כל השאלות";
+      }
+    });
+
+    function displayAllQuestions() {
+      allQuestionsContainer.innerHTML = '<h2>כל השאלות והתשובות</h2>'; // Add title back
+      quizData.forEach((q, i) => {
+        const qDiv = document.createElement("div");
+        qDiv.className = "all-question";
+
+        const qTitle = document.createElement("h3");
+        // Use innerHTML for question title to render spans
+        qTitle.innerHTML = `${i + 1}. ${q.question}`;
+        qDiv.appendChild(qTitle);
+
+        const ul = document.createElement("ul");
+        q.options.forEach((option, idx) => {
+          const li = document.createElement("li");
+          // Use innerHTML for options
+          li.innerHTML = option;
+          if (idx === q.correctIndex) {
+            li.classList.add("correct-answer");
+            li.innerHTML += " (נכון)"; // Indicate correct answer clearly
+          }
+          ul.appendChild(li);
+        });
+        qDiv.appendChild(ul);
+
+        const exp = document.createElement("div");
+        exp.className = "all-explanation";
+        exp.innerHTML = q.explanation; // Use innerHTML for potential formatting
+        qDiv.appendChild(exp);
+
+        allQuestionsContainer.appendChild(qDiv);
+      });
+    }
+
+    // Initial load
+    loadQuestion();
+  </script>
+</body>
+</html>

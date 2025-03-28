@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>חידון – ייבוש מזון</title>
+  <style>
+    /* PASTE THE EXACT SAME CSS RULES FROM introduction_new.html HERE */
+     :root {
+      --primary-color: #007bff; /* Blue */
+      --primary-hover-color: #0056b3;
+      --correct-color: #28a745; /* Green */
+      --correct-bg-color: #d4edda;
+      --incorrect-color: #dc3545; /* Red */
+      --incorrect-bg-color: #f8d7da;
+      --explanation-bg-color: #e2e3e5; /* Light Gray */
+      --explanation-border-color: #adb5bd;
+      --text-color: #343a40; /* Dark Gray */
+      --light-text-color: #6c757d; /* Medium Gray */
+      --background-color: #f8f9fa; /* Very Light Gray */
+      --container-bg-color: #ffffff; /* White */
+      --border-color: #dee2e6; /* Light Gray Border */
+      --button-secondary-bg: #6c757d; /* Gray for 'View All' */
+      --button-secondary-hover: #5a6268;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      direction: rtl;
+      text-align: right;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 25px;
+      background-color: var(--container-bg-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .quiz-header {
+        text-align: center;
+        margin-bottom: 25px;
+        color: var(--primary-color);
+        font-size: 1.8em;
+        font-weight: 600;
+    }
+
+    .question-container {
+      background-color: var(--container-bg-color); /* Consistent background */
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .question-text {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    /* Ensure LTR spans inside RTL text are handled visually */
+    .question-text span[dir="ltr"] {
+        display: inline-block;
+        margin: 0 0.2em;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .option {
+      margin-bottom: 12px;
+    }
+
+    button.option-button {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 1em;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background-color: var(--container-bg-color);
+      color: var(--text-color);
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+      text-align: right;
+    }
+
+    button.option-button:hover:not(:disabled) {
+      background-color: #f1f3f5; /* Lighter gray on hover */
+      border-color: #ced4da;
+    }
+
+    button.option-button:active:not(:disabled) {
+        transform: scale(0.99);
+    }
+
+    button.option-button:disabled {
+        cursor: default;
+        opacity: 0.8;
+    }
+
+    button.option-button.correct {
+      background-color: var(--correct-bg-color);
+      border-color: var(--correct-color);
+      color: var(--correct-color);
+      font-weight: 500;
+    }
+
+    button.option-button.incorrect {
+      background-color: var(--incorrect-bg-color);
+      border-color: var(--incorrect-color);
+      color: var(--incorrect-color);
+      font-weight: 500;
+    }
+
+     button.option-button .feedback-icon {
+        float: left;
+        font-weight: bold;
+        margin-left: 10px;
+     }
+
+    .explanation {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: var(--explanation-bg-color);
+      border-right: 4px solid var(--explanation-border-color); /* Right border for RTL */
+      border-radius: 4px;
+      font-size: 0.95em;
+      color: var(--light-text-color);
+    }
+    .explanation strong {
+        color: var(--text-color);
+    }
+    /* Ensure LTR math/code in explanations is handled */
+    .explanation span[dir="ltr"], .explanation [dir="ltr"], .explanation code {
+        display: inline-block;
+        direction: ltr;
+        text-align: left;
+        margin: 0 0.2em;
+        font-family: monospace; /* Use monospace for code-like elements */
+        background-color: #d8dadc; /* Slightly darker background for code */
+        padding: 0.1em 0.3em;
+        border-radius: 3px;
+    }
+
+
+    .quiz-controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+    }
+
+    .control-button {
+      padding: 10px 25px;
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .control-button:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    #next-btn {
+      background-color: var(--primary-color);
+    }
+    #next-btn:hover {
+      background-color: var(--primary-hover-color);
+    }
+
+    #view-all-btn {
+      background-color: var(--button-secondary-bg);
+    }
+     #view-all-btn:hover {
+      background-color: var(--button-secondary-hover);
+    }
+
+    .all-questions-container {
+      display: none;
+      margin-top: 30px;
+      max-height: 500px; /* Increased height */
+      overflow-y: auto;
+      background-color: var(--container-bg-color);
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+     .all-questions-container h2 {
+        text-align: center;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+     }
+
+    .all-question {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .all-question:last-child {
+        border-bottom: none;
+    }
+
+     .all-question h3 {
+        font-size: 1.1em;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 10px;
+     }
+     .all-question ul {
+         list-style: none;
+         padding-right: 15px; /* Indentation for options */
+         margin-top: 5px;
+         margin-bottom: 10px;
+     }
+      .all-question li {
+         margin-bottom: 5px;
+         color: var(--light-text-color);
+      }
+      .all-question li.correct-answer {
+          color: var(--correct-color);
+          font-weight: 500;
+      }
+       .all-question .all-explanation {
+           font-size: 0.9em;
+           color: var(--light-text-color);
+           padding-right: 15px;
+       }
+        .all-question .all-explanation strong {
+           color: var(--text-color);
+        }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="quiz-header">חידון – ייבוש מזון</h1>
+    <div id="quiz-container" class="question-container">
+        <!-- Question content will be loaded here by JavaScript -->
+    </div>
+    <div class="quiz-controls">
+        <button id="view-all-btn" class="control-button">הצג את כל השאלות</button>
+        <button id="next-btn" class="control-button" style="display: none;">שאלה הבאה</button>
+    </div>
+    <div id="all-questions" class="all-questions-container">
+        <h2>כל השאלות והתשובות</h2>
+        <!-- All questions content will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    // Renamed 'questions' to 'quizData' for consistency
+    const quizData = [
+       {
+        question: "מהי המטרה העיקרית של ייבוש מזון?",
+        options: [
+          "שיפור הטעם",
+          "שימור המזון על ידי הורדת פעילות המים (<code>a<sub>w</sub></code>)", // Added aw symbol
+          "הוספת ערך תזונתי",
+          "שינוי צבע המזון"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> תהליך הייבוש מוריד את פעילות המים (<code>a<sub>w</sub></code>) במזון לרמה נמוכה המעכבת צמיחת מיקרואורגניזמים ותגובות כימיות ואנזימטיות, ובכך מאריך את חיי המדף."
+      },
+      {
+        question: "לאיזה אחוז רטיבות (תכולת מים) מיובשים רוב המזונות בשיטות קונבנציונליות?",
+        options: [
+          "פחות מ-5%",
+          "בין 10%-15%",
+          "25%",
+          "50%"
+        ],
+        correctIndex: 0, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> רוב המזונות מיובשים לרמת רטיבות נמוכה מאוד, בדרך כלל פחות מ-5% (ולעיתים קרובות 1-3%), כדי להבטיח יציבות וחיי מדף ארוכים."
+      },
+      {
+        question: "מהו הכוח המניע העיקרי בתהליך הייבוש באוויר חם?",
+        options: [
+          "לחץ אוויר",
+          "הפרש לחצי אדי המים בין פני השטח של המזון לאוויר המייבש", // More precise
+          "מהירות הרוח",
+          "לחות האוויר בלבד"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> הכוח המניע לאידוי המים הוא ההפרש בין לחץ אדי המים על פני השטח של המזון (התלוי בטמפרטורה ובתכולת המים) לבין לחץ אדי המים באוויר המייבש (התלוי בטמפרטורה ובלחות היחסית שלו)."
+      },
+      {
+        question: "איזו שיטת ייבוש מבוססת בעיקר על הולכת חום ממשטח חם?",
+        options: [
+          "ייבוש באוויר חם (תנור, מינהרה)",
+          "ייבוש בהתזה",
+          "ייבוש במגע (תוף, ואקום מדף)", // More specific examples
+          "ייבוש בהקפאה (ליופיליזציה)"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בשיטות ייבוש במגע, כגון ייבוש תוף (drum drying) או ייבוש ואקום על מדפים חמים (vacuum shelf drying), החום מועבר למזון בעיקר באמצעות הולכה מהמשטח החם שאיתו הוא בא במגע."
+      },
+      {
+        question: "מהו יתרון מרכזי של ייבוש בואקום?",
+        options: [
+          "מאפשר ייבוש בטמפרטורות גבוהות",
+          "מאפשר ייבוש בטמפרטורות נמוכות יותר (הורדת נק' רתיחה) ומניעת חמצון", // Combines benefits
+          "צריכת אנרגיה גבוהה",
+          "אי התאמה לשיחזור מהיר"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ייבוש תחת ואקום (לחץ נמוך) מוריד את טמפרטורת הרתיחה של המים, ומאפשר ייבוש בטמפרטורות נמוכות יותר, מה ששומר טוב יותר על רכיבים רגישים לחום. בנוסף, הסביבה דלת החמצן מונעת תגובות חמצון."
+      },
+      {
+        question: "מהו החיסרון העיקרי של ייבוש תוף (Drum Drying)?",
+        options: [
+          "תהליך איטי מאוד",
+          "מתאים רק למזונות נוזליים או בצקיים שניתן למרוח כשכבה דקה; עלול לגרום נזק תרמי", // More specific
+          "צורך בכמויות גדולות של אוויר",
+          "לא מתאים לייבוש מהיר"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ייבוש תוף מתאים בעיקר למזונות נוזליים או בצקיים שניתן למרוח כשכבה דקה על התוף החם. הטמפרטורות הגבוהות יחסית וזמן המגע הקצר עלולים לגרום לנזק תרמי מסוים למוצרים רגישים."
+      },
+      {
+        question: "איזה שינוי פיזיקלי שלילי עלול להתרחש במזון מוצק בעת ייבוש?",
+        options: [
+          "עלייה בנפח",
+          "התכווצות (Shrinkage), התקשות פני השטח (Case Hardening), שינוי מבנה פנימי (פגיעה בנקבוביות)", // More specific examples
+          "שיפור המרקם",
+          "עלייה ביכולת החזקת המים"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> במהלך הייבוש, איבוד המים גורם לכוחות פנימיים המובילים להתכווצות המוצר. במקרים מסוימים, פני השטח מתייבשים ומתקשים מהר מדי (Case Hardening), מה שמקשה על יציאת מים מהפנים ופוגע ביכולת השיחזור (rehydration). גם המבנה הנקבובי הפנימי עלול לקרוס."
+      },
+      {
+        question: "מה חייבת לכלול אריזת מזון מיובש?",
+        options: [
+          "חדירות לרטיבות וחמצן",
+          "מחסום יעיל בפני חדירת רטיבות וחמצן",
+          "צבע בהיר",
+          "מרקם רך"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> מזון מיובש רגיש מאוד לספיחת לחות מהסביבה ולחמצון. לכן, האריזה חייבת לספק מחסום טוב בפני חדירת אדי מים וחמצן כדי לשמור על איכותו וחיי המדף שלו."
+      },
+      {
+        question: "מהו ייבוש בהקפאה (ליופיליזציה)?",
+        options: [
+          "ייבוש בטמפרטורות גבוהות",
+          "שימוש באוויר חם לייבוש",
+          "תהליך בו מים מוסרים מהמזון הקפוא באמצעות המראה (סובלימציה) - מעבר ישיר מקרח לאדים - תחת ואקום", // More specific
+          "הוספת מים למזון"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בייבוש בהקפאה (ליופיליזציה), המזון מוקפא תחילה, ולאחר מכן מופעל ואקום גבוה. בתנאים אלו, מספקים מעט חום המאפשר למים במצב קרח לעבור ישירות למצב גז (אדים) בתהליך הנקרא המראה (סובלימציה), מבלי לעבור דרך המצב הנוזלי."
+      },
+      {
+        question: "מה משמעות המונח <code>%RH</code> בתהליך הייבוש?",
+        options: [
+          "טמפרטורה יחסית",
+          "לחות יחסית (Relative Humidity)",
+          "מהירות זרימת האוויר",
+          "לחץ חלקי"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <code>%RH</code> מייצג לחות יחסית. זהו היחס (באחוזים) בין כמות אדי המים הנמצאת באוויר לבין הכמות המרבית שאוויר יכול להכיל באותה טמפרטורה ולחץ. לחות יחסית נמוכה של אוויר הייבוש חיונית לקליטת לחות מהמזון."
+      },
+      {
+        question: "מהו הגורם העיקרי המשפיע על קצב הייבוש בשלב הראשון (Constant Rate Period)?",
+        options: [
+          "גודל האריזה",
+          "תנאי הסביבה (טמפרטורה, לחות, מהירות אוויר) הקובעים את קצב מעבר החום והמסה מפני השטח", // More precise
+          "תכולת הרטיבות הפנימית של המזון",
+          "צבע המזון"
+        ],
+        correctIndex: 1, // Corrected index from original file, clarifying it relates to the constant rate period
+        explanation: "<strong>הסבר:</strong> בשלב הראשון של הייבוש (Constant Rate Period), פני השטח של המזון רוויים במים, וקצב הייבוש נקבע בעיקר על ידי קצב העברת החום מהסביבה אל פני השטח וקצב העברת המסה (אדי מים) מפני השטח אל האוויר. גורמים אלו מושפעים מטמפרטורת האוויר, הלחות היחסית שלו ומהירות הזרימה שלו."
+      },
+      {
+        question: "מהו היתרון המרכזי בשימוש בטמפרטורות נמוכות יחסית בתהליך הייבוש (כמו בייבוש ואקום או הקפאה)?",
+        options: [
+          "חיסכון בעלויות ייצור",
+          "שימור טוב יותר של רכיבים רגישים לחום (ויטמינים, צבעים, חומרי ארומה)", // Combines benefits
+          "מניעת התכווצות",
+          "האצת תהליך הייבוש"
+        ],
+        correctIndex: 1, // Corrected index from original file, focusing on quality
+        explanation: "<strong>הסבר:</strong> שימוש בטמפרטורות נמוכות יותר בתהליך הייבוש מפחית את הנזק התרמי לרכיבים רגישים כמו ויטמינים, פיגמנטים וחומרי טעם וריח, וכן מפחית תגובות השחמה לא רצויות, ובכך שומר טוב יותר על איכות המוצר הסופי."
+      },
+      {
+        question: "מהו תפקידו של ציקלון בייבוש בהתזה (Spray Drying)?",
+        options: [
+          "חימום האוויר",
+          "קירור האבקה",
+          "הפרדת רוב חלקיקי האבקה מהאוויר היוצא באמצעות כוח צנטריפוגלי",
+          "הוספת לחות לאוויר"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בייבוש בהתזה, האוויר החם היוצא מתא הייבוש נושא איתו חלקיקי אבקה. הציקלון משמש להפרדת חלקיקים אלו מהאוויר באמצעות סיחרור מהיר היוצר כוח צנטריפוגלי, המפיל את החלקיקים לתחתית הציקלון לאיסוף."
+      },
+      {
+        question: "מהו העיקרון המרכזי בייבוש מוצקים בזרם אוויר חם (כמו בתנור או מינהרת ייבוש)?",
+        options: [
+          "קירור המוצר",
+          "שימוש בלחות גבוהה",
+          "הסעת חום מהאוויר החם אל המזון הגורמת לאידוי המים, והסעת מסה של אדי המים מהמזון אל האוויר", // More complete explanation
+          "יצירת ואקום"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בשיטה זו, אוויר חם ויבש יחסית זורם על פני המזון. החום מועבר בהסעה מהאוויר למזון ומספק את האנרגיה לאידוי המים. אדי המים מועברים בהסעת מסה מפני המזון אל זרם האוויר ונלקחים משם."
+      },
+      {
+        question: "מהו היתרון העיקרי של ייבוש תוף לייצור פתיתי דגנים (דייסה) לתינוקות?",
+        options: [
+          "עלות נמוכה יחסית",
+          "ייבוש מהיר מאוד (שניות) ובישול/ג'לטיניזציה של העמילן בו-זמנית", // Combines benefits
+          "שמירה על מרקם רך",
+          "אפשרות לייבוש מוצרים שאינם נדבקים למתכת"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> שיטת ייבוש תוף מאפשרת ייבוש מהיר מאוד (תוך שניות) של הבצק/דייסה המרוחה על התוף. החום הגבוה גם מבשל ומבצע ג'לטיניזציה של העמילן, מה שהופך את המוצר לקל לעיכול ומוכן לשיחזור מהיר במים או חלב."
+      },
+      {
+        question: "מהו המאפיין העיקרי של תהליך ייבוש במגע עם משטח חם?",
+        options: [
+          "מתאים לייבוש בהקפאה",
+          "משתמש באוויר חם כתווך עיקרי",
+          "מעבר החום למזון מתבצע בעיקר בהולכה מהמשטח החם",
+          "מיועד לייבוש בהתזה"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בתהליכי ייבוש במגע (Contact Drying), המזון (לרוב כשכבה דקה) נמצא במגע ישיר עם משטח מתכתי מחומם (כמו תוף או מדף), ומעבר החום העיקרי המספק את אנרגיית האידוי מתבצע בהולכה."
+      },
+      {
+        question: "מהו הגורם המרכזי שמשפיע על איכות השיחזור (Rehydration) של מזון יבש?",
+        options: [
+          "צבע המוצר",
+          "מידת השינוי במבנה הפיזי של המזון במהלך הייבוש (התכווצות, קריסת נקבוביות, התקשות)",
+          "גודל האריזה",
+          "טמפרטורת האחסון"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> שינויים בלתי הפיכים במבנה המזון במהלך הייבוש, כמו התכווצות, קריסת המבנה הנקבובי והתקשות פני השטח, מקשים על חדירת המים חזרה לתוך המוצר בעת השיחזור ופוגעים במרקם ובמהירות התהליך."
+      },
+      {
+        question: "מהי הסכנה העיקרית בחדירת חמצן למזון מיובש?",
+        options: [
+          "שינוי במרקם בלבד",
+          "התפתחות חיידקים אנארוביים",
+          "חמצון ליפידים, ויטמינים רגישים ופיגמנטים, הגורם לפגיעה בטעם, בריח ובערך התזונתי", // More specific
+          "עלייה במשקל"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> חמצן מהאוויר עלול לגרום לתגובות חמצון במזון המיובש, במיוחד חמצון של שומנים (המוביל לטעמי לוואי), פירוק ויטמינים רגישים (כמו ויטמין C ו-A) ושינוי צבע של פיגמנטים."
+      },
+      {
+        question: "מהו היתרון המרכזי של ייבוש בהקפאה מבחינת איכות המוצר?",
+        options: [
+          "עלות נמוכה",
+          "פגיעה מינימלית במבנה, בטעם, בארומה וברכיבים תזונתיים רגישים; שיחזור מהיר", // More comprehensive
+          "תהליך מהיר",
+          "התאמה לכל סוגי המזון"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ייבוש בהקפאה, על ידי המראה של הקרח, שומר על המבנה הנקבובי של המזון בצורה מיטבית (פחות התכווצות), ופוגע באופן מינימלי ברכיבים רגישים לחום כמו חומרי טעם, ריח וויטמינים. המוצר המתקבל בדרך כלל בעל יכולת שיחזור טובה ומהירה."
+      },
+      {
+        question: "מהי המשמעות של המונח '<code>case hardening</code>' בתהליך הייבוש?",
+        options: [
+          "ריכוך פני השטח",
+          "התייבשות מהירה והתקשות של פני השטח, המונעת או מאטה את המשך יציאת הלחות מפנים המוצר",
+          "הוספת צבע לפני השטח",
+          "שיפור המרקם הכללי"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> '<code>Case hardening</code>' היא תופעה שבה פני השטח של המזון מתייבשים ומתקשים מהר מדי בתחילת תהליך הייבוש (בדרך כלל בטמפרטורות גבוהות), ויוצרים שכבה אטומה יחסית המקשה על המשך דיפוזיית המים מתוך המוצר אל פני השטח, מה שמאט את קצב הייבוש הכולל ועלול לגרום ללחות שיורית גבוהה בפנים."
+      }
+    ];
+
+    // PASTE THE EXACT SAME JAVASCRIPT CODE FROM introduction_new.html HERE
+    // Using innerHTML for potential formatting in explanations/questions
+     let currentQuestion = 0;
+    const quizContainer = document.getElementById("quiz-container");
+    const nextButton = document.getElementById("next-btn");
+    const viewAllButton = document.getElementById("view-all-btn");
+    const allQuestionsContainer = document.getElementById("all-questions");
+
+    function loadQuestion() {
+      quizContainer.innerHTML = ""; // Clear previous question
+      nextButton.style.display = "none"; // Hide next button initially
+
+      if (currentQuestion < quizData.length) {
+        const q = quizData[currentQuestion];
+        const questionEl = document.createElement("div");
+        questionEl.className = "question-text";
+        // Use innerHTML to render potential code/formatting tags in questions
+        questionEl.innerHTML = `${currentQuestion + 1}. ${q.question}`;
+        quizContainer.appendChild(questionEl);
+
+        const optionsList = document.createElement("ul");
+        optionsList.className = "options";
+        q.options.forEach((option, index) => {
+          const li = document.createElement("li");
+          li.className = "option";
+          const btn = document.createElement("button");
+          btn.className = "option-button";
+          // Use innerHTML for options too, in case they contain HTML
+          btn.innerHTML = option;
+          btn.onclick = () => selectOption(btn, index);
+          li.appendChild(btn);
+          optionsList.appendChild(li);
+        });
+        quizContainer.appendChild(optionsList);
+      } else {
+        quizContainer.innerHTML = `<h2 class="quiz-header" style="text-align:center;">סיימת את כל השאלות! כל הכבוד!</h2>`;
+        viewAllButton.style.display = 'block'; // Keep view all button visible
+        nextButton.style.display = 'none'; // Ensure next button is hidden
+      }
+    }
+
+    function selectOption(button, index) {
+      const q = quizData[currentQuestion];
+      const optionButtons = quizContainer.querySelectorAll(".option-button");
+      optionButtons.forEach(btn => btn.disabled = true); // Disable all buttons after selection
+
+      const correctIcon = '<span class="feedback-icon">✓</span>';
+      const incorrectIcon = '<span class="feedback-icon">✗</span>';
+
+      if (index === q.correctIndex) {
+        button.classList.add("correct");
+        button.innerHTML += correctIcon; // Use innerHTML to add icon
+      } else {
+        button.classList.add("incorrect");
+        button.innerHTML += incorrectIcon;
+        // Highlight the correct answer
+        optionButtons[q.correctIndex].classList.add("correct");
+        optionButtons[q.correctIndex].innerHTML += correctIcon;
+      }
+
+      // Display explanation
+      const explanation = document.createElement("div");
+      explanation.className = "explanation";
+      explanation.innerHTML = q.explanation; // Use innerHTML for formatting
+      quizContainer.appendChild(explanation);
+
+      // Show next button only if there are more questions
+      if (currentQuestion < quizData.length - 1) {
+           nextButton.style.display = "block";
+      } else {
+          nextButton.textContent = "סיימת!"; // Or hide it
+          nextButton.disabled = true;
+          nextButton.style.display = "block"; // Keep it visible but disabled
+      }
+    }
+
+    nextButton.addEventListener("click", () => {
+        if (currentQuestion < quizData.length -1) {
+             currentQuestion++;
+             loadQuestion();
+        }
+    });
+
+    viewAllButton.addEventListener("click", () => {
+      if (allQuestionsContainer.style.display === "none" || allQuestionsContainer.style.display === "") {
+        allQuestionsContainer.style.display = "block";
+        displayAllQuestions();
+        viewAllButton.textContent = "הסתר את כל השאלות";
+      } else {
+        allQuestionsContainer.style.display = "none";
+        viewAllButton.textContent = "הצג את כל השאלות";
+      }
+    });
+
+    function displayAllQuestions() {
+      allQuestionsContainer.innerHTML = '<h2>כל השאלות והתשובות</h2>'; // Add title back
+      quizData.forEach((q, i) => {
+        const qDiv = document.createElement("div");
+        qDiv.className = "all-question";
+
+        const qTitle = document.createElement("h3");
+        // Use innerHTML for question title to render potential formatting
+        qTitle.innerHTML = `${i + 1}. ${q.question}`;
+        qDiv.appendChild(qTitle);
+
+        const ul = document.createElement("ul");
+        q.options.forEach((option, idx) => {
+          const li = document.createElement("li");
+          // Use innerHTML for options
+          li.innerHTML = option;
+          if (idx === q.correctIndex) {
+            li.classList.add("correct-answer");
+            li.innerHTML += " (נכון)"; // Indicate correct answer clearly
+          }
+          ul.appendChild(li);
+        });
+        qDiv.appendChild(ul);
+
+        const exp = document.createElement("div");
+        exp.className = "all-explanation";
+        exp.innerHTML = q.explanation; // Use innerHTML for potential formatting
+        qDiv.appendChild(exp);
+
+        allQuestionsContainer.appendChild(qDiv);
+      });
+    }
+
+    // Initial load
+    loadQuestion();
+  </script>
+</body>
+</html>

@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>חידון – ריכוז מזון ואיוד</title>
+  <style>
+    /* PASTE THE EXACT SAME CSS RULES FROM introduction_new.html HERE */
+     :root {
+      --primary-color: #007bff; /* Blue */
+      --primary-hover-color: #0056b3;
+      --correct-color: #28a745; /* Green */
+      --correct-bg-color: #d4edda;
+      --incorrect-color: #dc3545; /* Red */
+      --incorrect-bg-color: #f8d7da;
+      --explanation-bg-color: #e2e3e5; /* Light Gray */
+      --explanation-border-color: #adb5bd;
+      --text-color: #343a40; /* Dark Gray */
+      --light-text-color: #6c757d; /* Medium Gray */
+      --background-color: #f8f9fa; /* Very Light Gray */
+      --container-bg-color: #ffffff; /* White */
+      --border-color: #dee2e6; /* Light Gray Border */
+      --button-secondary-bg: #6c757d; /* Gray for 'View All' */
+      --button-secondary-hover: #5a6268;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      direction: rtl;
+      text-align: right;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 25px;
+      background-color: var(--container-bg-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .quiz-header {
+        text-align: center;
+        margin-bottom: 25px;
+        color: var(--primary-color);
+        font-size: 1.8em;
+        font-weight: 600;
+    }
+
+    .question-container {
+      background-color: var(--container-bg-color); /* Consistent background */
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .question-text {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    /* Ensure LTR spans inside RTL text are handled visually */
+    .question-text span[dir="ltr"] {
+        display: inline-block;
+        margin: 0 0.2em;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .option {
+      margin-bottom: 12px;
+    }
+
+    button.option-button {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 1em;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background-color: var(--container-bg-color);
+      color: var(--text-color);
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+      text-align: right;
+    }
+
+    button.option-button:hover:not(:disabled) {
+      background-color: #f1f3f5; /* Lighter gray on hover */
+      border-color: #ced4da;
+    }
+
+    button.option-button:active:not(:disabled) {
+        transform: scale(0.99);
+    }
+
+    button.option-button:disabled {
+        cursor: default;
+        opacity: 0.8;
+    }
+
+    button.option-button.correct {
+      background-color: var(--correct-bg-color);
+      border-color: var(--correct-color);
+      color: var(--correct-color);
+      font-weight: 500;
+    }
+
+    button.option-button.incorrect {
+      background-color: var(--incorrect-bg-color);
+      border-color: var(--incorrect-color);
+      color: var(--incorrect-color);
+      font-weight: 500;
+    }
+
+     button.option-button .feedback-icon {
+        float: left;
+        font-weight: bold;
+        margin-left: 10px;
+     }
+
+    .explanation {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: var(--explanation-bg-color);
+      border-right: 4px solid var(--explanation-border-color); /* Right border for RTL */
+      border-radius: 4px;
+      font-size: 0.95em;
+      color: var(--light-text-color);
+    }
+    .explanation strong {
+        color: var(--text-color);
+    }
+    /* Ensure LTR math/code in explanations is handled */
+    .explanation span[dir="ltr"], .explanation [dir="ltr"], .explanation code {
+        display: inline-block;
+        direction: ltr;
+        text-align: left;
+        margin: 0 0.2em;
+        font-family: monospace; /* Use monospace for code-like elements */
+        background-color: #d8dadc; /* Slightly darker background for code */
+        padding: 0.1em 0.3em;
+        border-radius: 3px;
+    }
+
+
+    .quiz-controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+    }
+
+    .control-button {
+      padding: 10px 25px;
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .control-button:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    #next-btn {
+      background-color: var(--primary-color);
+    }
+    #next-btn:hover {
+      background-color: var(--primary-hover-color);
+    }
+
+    #view-all-btn {
+      background-color: var(--button-secondary-bg);
+    }
+     #view-all-btn:hover {
+      background-color: var(--button-secondary-hover);
+    }
+
+    .all-questions-container {
+      display: none;
+      margin-top: 30px;
+      max-height: 500px; /* Increased height */
+      overflow-y: auto;
+      background-color: var(--container-bg-color);
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+     .all-questions-container h2 {
+        text-align: center;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+     }
+
+    .all-question {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .all-question:last-child {
+        border-bottom: none;
+    }
+
+     .all-question h3 {
+        font-size: 1.1em;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 10px;
+     }
+     .all-question ul {
+         list-style: none;
+         padding-right: 15px; /* Indentation for options */
+         margin-top: 5px;
+         margin-bottom: 10px;
+     }
+      .all-question li {
+         margin-bottom: 5px;
+         color: var(--light-text-color);
+      }
+      .all-question li.correct-answer {
+          color: var(--correct-color);
+          font-weight: 500;
+      }
+       .all-question .all-explanation {
+           font-size: 0.9em;
+           color: var(--light-text-color);
+           padding-right: 15px;
+       }
+        .all-question .all-explanation strong {
+           color: var(--text-color);
+        }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="quiz-header">חידון – ריכוז מזון ואיוד</h1>
+    <div id="quiz-container" class="question-container">
+        <!-- Question content will be loaded here by JavaScript -->
+    </div>
+    <div class="quiz-controls">
+        <button id="view-all-btn" class="control-button">הצג את כל השאלות</button>
+        <button id="next-btn" class="control-button" style="display: none;">שאלה הבאה</button>
+    </div>
+    <div id="all-questions" class="all-questions-container">
+        <h2>כל השאלות והתשובות</h2>
+        <!-- All questions content will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    // Renamed 'questions' to 'quizData' for consistency
+    const quizData = [
+      {
+        question: "מהי המטרה העיקרית של ריכוז מזון?",
+        options: [
+          "להוסיף טעם למזון",
+          "להקטין את המשקל והנפח של המזון",
+          "להגדיל את תכולת המים במזון",
+          "להרוג את כל החיידקים במזון"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ריכוז מזון נועד בעיקר להקטין את המשקל והנפח, מה שמקל על אחסון ושינוע."
+      },
+      {
+        question: "מהו ההבדל העיקרי בין ריכוז לייבוש?",
+        options: [
+          "ריכוז משתמש בחום גבוה יותר מייבוש",
+          "ייבוש מסיר יותר מים מריכוז",
+          "ריכוז משמש רק למוצרי חלב",
+          "אין הבדל בין ריכוז לייבוש"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בתהליך ייבוש מוסרים יותר מים, מה שמביא למוצר עם חיי מדף ארוכים יותר, לעומת ריכוז שבו נותרת כמות מים מסוימת."
+      },
+      {
+        question: "מהו אחוז החומר היבש האופייני במזון מרוכז?",
+        options: [
+          "5–10%",
+          "20–70%",
+          "90–95%",
+          "100%"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> מזון מרוכז מכיל בדרך כלל בין 20% ל־70% חומר יבש, בהתאם לסוג המוצר ולמטרה."
+      },
+      {
+        question: "איזו מבין השיטות הבאות משמשת לריכוז מזון?",
+        options: [
+          "טיגון",
+          "איוד",
+          "אפייה",
+          "הקפאה"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> איוד הוא שיטה נפוצה לריכוז מזון שבה מוסרים מים באמצעות חימום."
+      },
+      {
+        question: "מה קורה לנקודת הרתיחה של נוזל במהלך תהליך האיוד?",
+        options: [
+          "יורדת",
+          "עולה",
+          "נשארת קבועה",
+          "תלויה בסוג הנוזל"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ככל שהנוזל מתרכך ומתרכז (כלומר, ריכוז המומסים עולה), נקודת הרתיחה שלו עולה."
+      },
+      {
+        question: "מהו '<code>fouling</code>' בתהליך האיוד?",
+        options: [
+          "הוספת חומרי טעם למזון",
+          "הצטברות משקעים על דפנות המאייד",
+          "קירור מהיר של המזון",
+          "סינון המזון"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <code>Fouling</code> מתייחס להצטברות של משקעים על דפנות המאייד, מה שמפחית את יעילות התהליך."
+      },
+      {
+        question: "איזו תופעה רצויה בתהליך איוד של סירופ מייפל?",
+        options: [
+          "איבוד חומרי ארומה",
+          "השחמה",
+          "דנטורציה של חלבונים",
+          "גיבוש סוכר"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בתהליך איוד סירופ המייפל מתרחשת השחמה (בעיקר תגובות מייארד וקרמליזציה), התורמת לטעם ולארומה האופייניים של המוצר."
+      },
+      {
+        question: "מהי טמפרטורת האיוד האופיינית בתהליכי ריכוז?",
+        options: [
+          "0–10 מעלות צלזיוס",
+          "45–90 מעלות צלזיוס",
+          "100–120 מעלות צלזיוס",
+          "200 מעלות צלזיוס ומעלה"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> טמפרטורת האיוד בתהליכי ריכוז נעה בדרך כלל בין <code>45°C</code> ל־<code>90°C</code>, לעיתים קרובות תחת ואקום כדי לאפשר רתיחה בטמפרטורות נמוכות יותר."
+      },
+      {
+        question: "מהו טווח לחץ העבודה האופייני במאייד תעשייתי (ואקום)?",
+        options: [
+          "1–5 אטמוספירות",
+          "0.1–0.8 אטמוספירות (לחץ אבסולוטי)",
+          "10 אטמוספירות ומעלה",
+          "לחץ אטמוספרי רגיל (כ-1 אטמ')"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> מאיידים תעשייתיים עובדים לעיתים קרובות תחת ואקום, בלחצים אבסולוטיים נמוכים (<code>0.1–0.8 atm</code>), מה שמאפשר איוד בטמפרטורות נמוכות יותר ומניעת נזק למוצר."
+      },
+      {
+        question: "מהו היתרון העיקרי של שימוש באיוד רב-דרגי (Multi-effect)?",
+        options: [
+          "חימום מהיר יותר",
+          "ניצולת קיטור (יעילות אנרגטית) גבוהה יותר",
+          "טמפרטורות נמוכות יותר",
+          "עלויות הקמה נמוכות יותר"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בשיטת איוד רב-דרגי נעשה שימוש חוזר באדים שיוצאים מדרגה אחת לחימום הדרגה הבאה, מה שמוביל לניצולת אנרגטית משופרת וחיסכון בקיטור."
+      },
+      {
+        question: "באיזה סוג מאייד משתמשים כאשר האדים היוצאים מדרגה אחת משמשים כמדיום החימום של הדרגה הבאה?",
+        options: [
+          "Batch pan evaporator",
+          "Rising film evaporator",
+          "Falling film evaporator",
+          "Multi-effect evaporator"
+        ],
+        correctIndex: 3, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> במאייד רב-דרגי (<code>Multi-effect evaporator</code>) נעשה שימוש חוזר באנרגיה – האדים מדרגה אחת משמשים לחימום הדרגה הבאה הפועלת בלחץ נמוך יותר."
+      },
+      {
+        question: "מהו החיסרון העיקרי של ריכוז בהקפאה?",
+        options: [
+          "עלויות גבוהות",
+          "טמפרטורות גבוהות",
+          "פגיעה בטעם המזון",
+          "זמן עיבוד קצר"
+        ],
+        correctIndex: 0, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ריכוז בהקפאה הוא תהליך יקר יותר משיטות אחרות בשל הציוד המורכב והאנרגיה הנדרשת לקירור והפרדה."
+      },
+      {
+        question: "מהו היתרון המרכזי של ריכוז בהקפאה?",
+        options: [
+          "עלויות נמוכות",
+          "קצב ייצור מהיר",
+          "שימור טוב יותר של חומרי טעם וארומה",
+          "שימוש בטמפרטורות גבוהות"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ריכוז בהקפאה שומר בצורה מיטבית על חומרי הטעם והארומה, שכן התהליך מתבצע בטמפרטורות נמוכות המונעות פגיעה ברכיבים רגישים."
+      },
+      {
+        question: "מהי המטרה של ערבוב מכני איטי בתהליך ריכוז בהקפאה?",
+        options: [
+          "להקטין את גודל גבישי הקרח",
+          "להגדיל את גודל גבישי הקרח",
+          "להאיץ את ההקפאה",
+          "למנוע היווצרות גבישים"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ערבוב מכני איטי מסייע לגבישי הקרח לגדול, דבר שמפחית את כמות התרכיז הכלוא בתוך הקרח ומשפר את יעילות ההפרדה."
+      },
+      {
+        question: "מהן השיטות הממברנליות הנפוצות לריכוז מזון?",
+        options: [
+          "איוד ואוסמוזה הפוכה",
+          "אולטרה-פילטרציה (UF) ואוסמוזה הפוכה (RO)",
+          "הקפאה ואיוד",
+          "זיקוק ופילטרציה"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> שיטות ממברנליות כגון אולטרה-פילטרציה (UF) ואוסמוזה הפוכה (RO) מאפשרות הפרדת מים (ולעיתים מומסים קטנים) ממזון דרך ממברנות סלקטיביות, ללא שימוש בחום."
+      },
+      {
+        question: "מה משפיע על מעבר החום בתהליכי איוד?",
+        options: [
+          "רק טמפרטורת הקיטור",
+          "הפרש הטמפרטורה ומקדם מעבר החום הכולל",
+          "רק צמיגות המזון",
+          "רק סוג המאייד"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> קצב מעבר החום (Q) תלוי בהפרש הטמפרטורה (ΔT) בין מדיום החימום למזון ובמקדם מעבר החום הכולל (U), המשפיעים על קצב האידוי. Q = U * A * ΔT."
+      },
+      {
+        question: "מה יכול להשפיע על מקדם מעבר החום (h) בצד המזון של דופן המאייד?",
+        options: [
+          "רק טמפרטורת המזון",
+          "צמיגות המזון ומהירות הזרימה",
+          "רק לחץ המאייד",
+          "רק סוג המזון"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> צמיגות המזון, עובי שכבת הגבול ומהירות הזרימה שלו משפיעים על יעילות מעבר החום מהדופן אל המזון (מקדם הסעה h)."
+      },
+      {
+        question: "מהי מטרת השימוש בואקום בתהליכי איוד?",
+        options: [
+          "להגדיל את טמפרטורת הרתיחה",
+          "להקטין את טמפרטורת הרתיחה",
+          "להגדיל את הלחץ",
+          "לשמור על לחץ קבוע"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> שימוש בואקום (לחץ נמוך) מוריד את נקודת הרתיחה של המים, ומאפשר ביצוע איוד בטמפרטורות נמוכות יותר, מה שמפחית נזק תרמי למזון."
+      },
+      {
+        question: "איזה שינוי במזון יכול להתרחש במהלך אחסון מזון מרוכז?",
+        options: [
+          "רק שינוי בצבע",
+          "שינוי במראה, במרקם, בטעם או בצבע",
+          "רק שינוי בטעם",
+          "אין שינוי"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> במהלך אחסון מזון מרוכז יכולים להתרחש שינויים פיזיקליים (כמו גיבוש), כימיים (כמו השחמה) ומיקרוביאליים (אם פעילות המים אינה נמוכה מספיק), המשפיעים על מראהו, מרקמו, טעמו וצבעו."
+      },
+      {
+        question: "מהי השחמה בלתי אנזימטית?",
+        options: [
+          "תהליך רצוי בכל סוגי המזון",
+          "תגובה כימית (כמו מייארד או קרמליזציה) הגורמת לשינוי צבע",
+          "תהליך המתרחש רק בירקות",
+          "תהליך המתרחש רק בפירות"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> השחמה בלתי אנזימטית היא תוצאה של תגובות כימיות (כמו תגובת מייארד בין סוכרים לחלבונים, או קרמליזציה של סוכרים) הגורמות לשינוי צבע (לרוב לחום), ויכולה להיות רצויה (במייפל) או בלתי רצויה (במיצים מרוכזים) בהתאם למוצר."
+      },
+      {
+        question: "מהו אחד הפתרונות הטכנולוגיים לאיוד מהיר ומסיבי של מים?",
+        options: [
+          "קירור מהיר של המזון",
+          "אופטימיזציה של מעבר החום (למשל, הגדלת שטח פנים ושימוש ב-Film Evaporators)",
+          "הוספת חומרים משמרים",
+          "הגדלת לחץ המאייד"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> אופטימיזציה של מעבר החום – באמצעות הגדלת שטח הפנים (A) והפרש הטמפרטורה (ΔT), ושיפור מקדם מעבר החום (U) על ידי יצירת שכבות דקות (film) – מאפשרת איוד מהיר ויעיל."
+      },
+      {
+        question: "מהי המשמעות של 'אבנית' (<code>scale</code>) במאייד?",
+        options: [
+          "סוג של מזון חדש",
+          "הצטברות משקעים מינרליים על דופן המאייד",
+          "שיטת חימום",
+          "סוג של חיידק"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> 'אבנית' (<code>scale</code>) מתייחסת להצטברות משקעים (לרוב מינרליים) על משטחי מעבר החום במאייד, מה שמפחית את יעילות מעבר החום (מקטין את U)."
+      },
+      {
+        question: "מה היתרון בשימוש במאייד רב-שלבי (<code>Multi-effect evaporator</code>)?",
+        options: [
+          "עלות הקמה נמוכה יותר",
+          "יעילות אנרגטית גבוהה יותר (חיסכון בקיטור)",
+          "מהירות איוד גבוהה יותר בכל דרגה",
+          "טמפרטורת עבודה גבוהה יותר"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> מאייד רב-דרגי מנצל את האדים שיוצאים מדרגה אחת לחימום הדרגה הבאה, מה שמוביל ליעילות אנרגטית מוגברת וחיסכון משמעותי בצריכת קיטור בהשוואה למאייד חד-דרגי."
+      },
+      {
+        question: "מהו העיקרון המרכזי של ריכוז בהקפאה (<code>Freeze Concentration</code>)?",
+        options: [
+          "חימום המזון לטמפרטורה גבוהה",
+          "הקפאת המים והסרת גבישי הקרח",
+          "הוספת חומרים כימיים",
+          "שימוש בלחץ גבוה"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ריכוז בהקפאה מבוסס על קירור מבוקר של המזון הנוזלי ליצירת גבישי קרח (שהם מים כמעט טהורים), והפרדתם מהתמיסה המרוכזת שנותרה."
+      },
+      {
+        question: "אילו מוצרים מועדפים לריכוז באמצעות הקפאה?",
+        options: [
+          "מוצרים זולים",
+          "מוצרי פרימיום הרגישים לחום (כמו מיצים, קפה, בירה)",
+          "מוצרים הדורשים חיי מדף ארוכים מאוד",
+          "מוצרים הדורשים עיבוד בטמפרטורה גבוהה"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> שיטת ההקפאה נבחרת בעיקר עבור מוצרי פרימיום הרגישים לחום (כמו רכזי מיצים, קפה נמס איכותי, בירות, יינות) משום שהיא שומרת בצורה מיטבית על הטעם והארומה המקוריים."
+      },
+      {
+        question: "מה החשיבות של גודל גבישי הקרח בתהליך הריכוז בהקפאה?",
+        options: [
+          "גבישים קטנים מועדפים",
+          "גבישים גדולים מועדפים",
+          "גודל הגבישים לא משנה",
+          "תלוי בסוג המזון"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> חשוב שהגבישים יהיו גדולים ואחידים ככל האפשר כדי למזער את כמות התרכיז הכלוא בין/על פני הגבישים וכדי להקל על הפרדתם מהתרכיז (למשל, בסינון או צנטריפוגה)."
+      },
+      {
+        question: "מהי המטרה של תהליך ה-<code>slurry</code> בריכוז בהקפאה?",
+        options: [
+          "להמיס את הקרח",
+          "לייצר תערובת של גבישי קרח ותרכיז נוזלי הניתנת לשאיבה והפרדה",
+          "להוסיף טעם",
+          "להגדיל את הטמפרטורה"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> תהליך ה-<code>slurry</code> מתייחס ליצירת התערובת (דמוית ברד) של גבישי קרח ותרכיז נוזלי במקפיא-מגרד (scraped surface heat exchanger), שניתן להעביר הלאה לשלב ההפרדה."
+      },
+      {
+        question: "מה היתרון של אוסמוזה הפוכה (<code>Reverse Osmosis</code>) בהשוואה לאיוד?",
+        options: [
+          "עלות הקמה נמוכה יותר",
+          "שימור טוב יותר של חומרי טעם וארומה (עבודה ללא חימום)",
+          "מהירות תהליך גבוהה יותר",
+          "מתאים לכל ריכוז סופי"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> אוסמוזה הפוכה פועלת בטמפרטורת הסביבה וללא שינוי פאזה, ולכן מאפשרת שימור טוב יותר של חומרי הטעם והארומה הרגישים לחום, בהשוואה לאיוד הכרוך בחימום."
+      },
+      {
+        question: "מהי אוסמוזה הפוכה?",
+        options: [
+          "תהליך חימום",
+          "תהליך קירור",
+          "תהליך הפרדה ממברנלי המונע על ידי לחץ",
+          "תהליך תסיסה"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> אוסמוזה הפוכה היא שיטה ממברנלית שבה מפעילים לחץ גבוה על תמיסה כדי לגרום למים לעבור דרך ממברנה חדירה-למחצה, כנגד מפל הריכוזים, ובכך להפריד אותם מהמומסים."
+      },
+      {
+        question: "מה החיסרון של ריכוז מזון?",
+        options: [
+          "תמיד משפר טעם",
+          "יכול לגרום לאיבוד רכיבים תזונתיים רגישים (כמו ויטמינים) או לשינויים לא רצויים",
+          "תמיד משמר מזון ללא הגבלה",
+          "זול מאוד"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> תהליך הריכוז, במיוחד אם כרוך בחימום, עשוי לגרום לאיבוד של רכיבים תזונתיים רגישים (כמו ויטמין C) או לשינויים לא רצויים בטעם, בצבע ובמרקם."
+      },
+      {
+        question: "מהו העיקרון של איוד רב-שלבי (<code>Multi-effect Evaporation</code>)?",
+        options: [
+          "שימוש בטמפרטורות גבוהות מאוד",
+          "שימוש חוזר באנרגיית האדים מדרגה אחת לחימום הדרגה הבאה",
+          "הוספת מים בין הדרגות",
+          "שימוש בלחץ גבוה מאוד בכל הדרגות"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בשיטה זו משתמשים באנרגיה (חום כמוס) שבאדים היוצאים מדרגה אחת כדי לחמם ולרכז את התמיסה בדרגה הבאה, הפועלת בלחץ נמוך יותר (ולכן בטמפרטורת רתיחה נמוכה יותר). זה מייעל את ניצול האנרגיה."
+      },
+      {
+        question: "מהי המטרה העיקרית של שימוש במאייד?",
+        options: [
+          "הקפאה",
+          "הרתחה לצורך בישול",
+          "הסרת מים (איוד) לצורך ריכוז",
+          "הוספת מים"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> המאייד נועד להסיר מים ממזון נוזלי על ידי הרתחה (איוד), וכך להעלות את ריכוז המוצקים."
+      },
+      {
+        question: "מהו הגורם המרכזי המשפיע על קצב האיוד במאייד (בהינתן U ו-ΔT קבועים)?",
+        options: [
+          "צבע המזון",
+          "גובה המאייד",
+          "טמפרטורת הסביבה",
+          "שטח הפנים של משטחי החימום (A)"
+        ],
+        correctIndex: 3, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> לפי נוסחת מעבר החום Q = U * A * ΔT, שטח הפנים (A) בו מועבר החום משפיע באופן ישיר על קצב מעבר החום, ולכן על קצב האיוד – ככל שהשטח גדול יותר, התהליך מהיר יותר (בהנחת U ו-ΔT קבועים)."
+      },
+      {
+        question: "מה קורה לחומרי טעם וריח נדיפים במהלך תהליך האיוד?",
+        options: [
+          "תמיד משתפרים",
+          "יכולים להתאדות יחד עם המים וללכת לאיבוד",
+          "תמיד נשארים זהים בריכוזם",
+          "הופכים ליותר מרוכזים באופן יחסי למוצקים האחרים"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> במהלך האיוד, רכיבים נדיפים (ארומה) עלולים להתאדות יחד עם המים, מה שעלול לגרום לאיבוד חלק מחומרי הטעם והריח המקוריים. לעיתים משתמשים בטכניקות לשחזור ארומה."
+      },
+      {
+        question: "מהו היתרון של ריכוז בהקפאה על פני שיטות אחרות מבחינת איכות המוצר?",
+        options: [
+          "עלות נמוכה",
+          "שימור טוב יותר של טעם, ארומה ורכיבים תזונתיים רגישים",
+          "מהירות גבוהה",
+          "מתאים לכל סוגי המזון"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> מכיוון שריכוז בהקפאה מתבצע בטמפרטורות נמוכות וללא שינוי פאזה משמעותי לרכיבים שאינם מים, הוא מאפשר שימור מיטבי של טעמים, ארומות ורכיבים תזונתיים רגישים לחום, בהשוואה לשיטות המבוססות על חימום."
+      },
+      {
+        question: "איזה סוג מאייד משתמש בסיבוב ובכוח צנטריפוגלי ליצירת שכבה דקה והגברת קצב האיוד?",
+        options: [
+          "מאייד סיר (Pan Evaporator)",
+          "מאייד סרט נופל (Falling Film)",
+          "מאייד קונוס מסתובב צנטריפוגלי (Centrifugal Thin-Film Evaporator)",
+          "מאייד רב-דרגי (Multi-effect)"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> במכשיר מסוג מאייד קונוס מסתובב (כמו ה-Spinning Cone Column) או מאיידים צנטריפוגליים אחרים, נעשה שימוש בסיבוב ובכוח צנטריפוגלי ליצירת שכבה דקה מאוד של נוזל על משטח החימום, מה שמאפשר מעבר חום ואיוד מהירים ויעילים מאוד, גם למוצרים צמיגים."
+      }
+    ];
+
+
+    // PASTE THE EXACT SAME JAVASCRIPT CODE FROM introduction_new.html HERE
+    // Modified JS slightly to use innerHTML for elements that might contain <code> tags
+     let currentQuestion = 0;
+    const quizContainer = document.getElementById("quiz-container");
+    const nextButton = document.getElementById("next-btn");
+    const viewAllButton = document.getElementById("view-all-btn");
+    const allQuestionsContainer = document.getElementById("all-questions");
+
+    function loadQuestion() {
+      quizContainer.innerHTML = ""; // Clear previous question
+      nextButton.style.display = "none"; // Hide next button initially
+
+      if (currentQuestion < quizData.length) {
+        const q = quizData[currentQuestion];
+        const questionEl = document.createElement("div");
+        questionEl.className = "question-text";
+        // Use innerHTML to render potential code tags in questions
+        questionEl.innerHTML = `${currentQuestion + 1}. ${q.question}`;
+        quizContainer.appendChild(questionEl);
+
+        const optionsList = document.createElement("ul");
+        optionsList.className = "options";
+        q.options.forEach((option, index) => {
+          const li = document.createElement("li");
+          li.className = "option";
+          const btn = document.createElement("button");
+          btn.className = "option-button";
+          // Use innerHTML for options too, in case they contain HTML
+          btn.innerHTML = option;
+          btn.onclick = () => selectOption(btn, index);
+          li.appendChild(btn);
+          optionsList.appendChild(li);
+        });
+        quizContainer.appendChild(optionsList);
+      } else {
+        quizContainer.innerHTML = `<h2 class="quiz-header" style="text-align:center;">סיימת את כל השאלות! כל הכבוד!</h2>`;
+        viewAllButton.style.display = 'block'; // Keep view all button visible
+        nextButton.style.display = 'none'; // Ensure next button is hidden
+      }
+    }
+
+    function selectOption(button, index) {
+      const q = quizData[currentQuestion];
+      const optionButtons = quizContainer.querySelectorAll(".option-button");
+      optionButtons.forEach(btn => btn.disabled = true); // Disable all buttons after selection
+
+      const correctIcon = '<span class="feedback-icon">✓</span>';
+      const incorrectIcon = '<span class="feedback-icon">✗</span>';
+
+      if (index === q.correctIndex) {
+        button.classList.add("correct");
+        button.innerHTML += correctIcon; // Use innerHTML to add icon
+      } else {
+        button.classList.add("incorrect");
+        button.innerHTML += incorrectIcon;
+        // Highlight the correct answer
+        optionButtons[q.correctIndex].classList.add("correct");
+        optionButtons[q.correctIndex].innerHTML += correctIcon;
+      }
+
+      // Display explanation
+      const explanation = document.createElement("div");
+      explanation.className = "explanation";
+      explanation.innerHTML = q.explanation; // Use innerHTML for formatting
+      quizContainer.appendChild(explanation);
+
+      // Show next button only if there are more questions
+      if (currentQuestion < quizData.length - 1) {
+           nextButton.style.display = "block";
+      } else {
+          nextButton.textContent = "סיימת!"; // Or hide it
+          nextButton.disabled = true;
+          nextButton.style.display = "block"; // Keep it visible but disabled
+      }
+    }
+
+    nextButton.addEventListener("click", () => {
+        if (currentQuestion < quizData.length -1) {
+             currentQuestion++;
+             loadQuestion();
+        }
+    });
+
+    viewAllButton.addEventListener("click", () => {
+      if (allQuestionsContainer.style.display === "none" || allQuestionsContainer.style.display === "") {
+        allQuestionsContainer.style.display = "block";
+        displayAllQuestions();
+        viewAllButton.textContent = "הסתר את כל השאלות";
+      } else {
+        allQuestionsContainer.style.display = "none";
+        viewAllButton.textContent = "הצג את כל השאלות";
+      }
+    });
+
+    function displayAllQuestions() {
+      allQuestionsContainer.innerHTML = '<h2>כל השאלות והתשובות</h2>'; // Add title back
+      quizData.forEach((q, i) => {
+        const qDiv = document.createElement("div");
+        qDiv.className = "all-question";
+
+        const qTitle = document.createElement("h3");
+        // Use innerHTML for question title to render potential formatting
+        qTitle.innerHTML = `${i + 1}. ${q.question}`;
+        qDiv.appendChild(qTitle);
+
+        const ul = document.createElement("ul");
+        q.options.forEach((option, idx) => {
+          const li = document.createElement("li");
+          // Use innerHTML for options
+          li.innerHTML = option;
+          if (idx === q.correctIndex) {
+            li.classList.add("correct-answer");
+            li.innerHTML += " (נכון)"; // Indicate correct answer clearly
+          }
+          ul.appendChild(li);
+        });
+        qDiv.appendChild(ul);
+
+        const exp = document.createElement("div");
+        exp.className = "all-explanation";
+        exp.innerHTML = q.explanation; // Use innerHTML for potential formatting
+        qDiv.appendChild(exp);
+
+        allQuestionsContainer.appendChild(qDiv);
+      });
+    }
+
+    // Initial load
+    loadQuestion();
+  </script>
+</body>
+</html>

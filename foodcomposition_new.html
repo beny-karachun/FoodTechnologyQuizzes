@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>חידון – הרכב המזון ואתגרי התעשייה</title>
+  <style>
+    /* PASTE THE EXACT SAME CSS RULES FROM introduction_new.html HERE */
+    :root {
+      --primary-color: #007bff; /* Blue */
+      --primary-hover-color: #0056b3;
+      --correct-color: #28a745; /* Green */
+      --correct-bg-color: #d4edda;
+      --incorrect-color: #dc3545; /* Red */
+      --incorrect-bg-color: #f8d7da;
+      --explanation-bg-color: #e2e3e5; /* Light Gray */
+      --explanation-border-color: #adb5bd;
+      --text-color: #343a40; /* Dark Gray */
+      --light-text-color: #6c757d; /* Medium Gray */
+      --background-color: #f8f9fa; /* Very Light Gray */
+      --container-bg-color: #ffffff; /* White */
+      --border-color: #dee2e6; /* Light Gray Border */
+      --button-secondary-bg: #6c757d; /* Gray for 'View All' */
+      --button-secondary-hover: #5a6268;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      direction: rtl;
+      text-align: right;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 25px;
+      background-color: var(--container-bg-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .quiz-header {
+        text-align: center;
+        margin-bottom: 25px;
+        color: var(--primary-color);
+        font-size: 1.8em;
+        font-weight: 600;
+    }
+
+    .question-container {
+      background-color: var(--container-bg-color); /* Consistent background */
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .question-text {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    /* Ensure LTR spans inside RTL text are handled visually */
+    .question-text span[dir="ltr"] {
+        display: inline-block;
+        margin: 0 0.2em;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .option {
+      margin-bottom: 12px;
+    }
+
+    button.option-button {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 1em;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background-color: var(--container-bg-color);
+      color: var(--text-color);
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+      text-align: right;
+    }
+
+    button.option-button:hover:not(:disabled) {
+      background-color: #f1f3f5; /* Lighter gray on hover */
+      border-color: #ced4da;
+    }
+
+    button.option-button:active:not(:disabled) {
+        transform: scale(0.99);
+    }
+
+    button.option-button:disabled {
+        cursor: default;
+        opacity: 0.8;
+    }
+
+    button.option-button.correct {
+      background-color: var(--correct-bg-color);
+      border-color: var(--correct-color);
+      color: var(--correct-color);
+      font-weight: 500;
+    }
+
+    button.option-button.incorrect {
+      background-color: var(--incorrect-bg-color);
+      border-color: var(--incorrect-color);
+      color: var(--incorrect-color);
+      font-weight: 500;
+    }
+
+     button.option-button .feedback-icon {
+        float: left;
+        font-weight: bold;
+        margin-left: 10px;
+     }
+
+    .explanation {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: var(--explanation-bg-color);
+      border-right: 4px solid var(--explanation-border-color); /* Right border for RTL */
+      border-radius: 4px;
+      font-size: 0.95em;
+      color: var(--light-text-color);
+    }
+    .explanation strong {
+        color: var(--text-color);
+    }
+    /* Ensure LTR math/code in explanations is handled */
+    .explanation span[dir="ltr"], .explanation [dir="ltr"], .explanation code {
+        display: inline-block;
+        direction: ltr;
+        text-align: left;
+        margin: 0 0.2em;
+        font-family: monospace; /* Use monospace for code-like elements */
+        background-color: #d8dadc; /* Slightly darker background for code */
+        padding: 0.1em 0.3em;
+        border-radius: 3px;
+    }
+
+
+    .quiz-controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+    }
+
+    .control-button {
+      padding: 10px 25px;
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .control-button:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    #next-btn {
+      background-color: var(--primary-color);
+    }
+    #next-btn:hover {
+      background-color: var(--primary-hover-color);
+    }
+
+    #view-all-btn {
+      background-color: var(--button-secondary-bg);
+    }
+     #view-all-btn:hover {
+      background-color: var(--button-secondary-hover);
+    }
+
+    .all-questions-container {
+      display: none;
+      margin-top: 30px;
+      max-height: 500px; /* Increased height */
+      overflow-y: auto;
+      background-color: var(--container-bg-color);
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+     .all-questions-container h2 {
+        text-align: center;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+     }
+
+    .all-question {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .all-question:last-child {
+        border-bottom: none;
+    }
+
+     .all-question h3 {
+        font-size: 1.1em;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 10px;
+     }
+     .all-question ul {
+         list-style: none;
+         padding-right: 15px; /* Indentation for options */
+         margin-top: 5px;
+         margin-bottom: 10px;
+     }
+      .all-question li {
+         margin-bottom: 5px;
+         color: var(--light-text-color);
+      }
+      .all-question li.correct-answer {
+          color: var(--correct-color);
+          font-weight: 500;
+      }
+       .all-question .all-explanation {
+           font-size: 0.9em;
+           color: var(--light-text-color);
+           padding-right: 15px;
+       }
+        .all-question .all-explanation strong {
+           color: var(--text-color);
+        }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="quiz-header">חידון – הרכב המזון ואתגרי התעשייה</h1>
+    <div id="quiz-container" class="question-container">
+        <!-- Question content will be loaded here by JavaScript -->
+    </div>
+    <div class="quiz-controls">
+        <button id="view-all-btn" class="control-button">הצג את כל השאלות</button>
+        <button id="next-btn" class="control-button" style="display: none;">שאלה הבאה</button>
+    </div>
+    <div id="all-questions" class="all-questions-container">
+        <h2>כל השאלות והתשובות</h2>
+        <!-- All questions content will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    // מערך האובייקטים המכיל את נתוני החידון
+    const quizData = [
+       {
+        question: "מהם אבות המזון העיקריים?",
+        options: [
+          "פחמימות, חלבונים, שומנים, מינרלים וויטמינים",
+          "סוכרים, עמילנים, סיבים תזונתיים",
+          "חומצות אמינו, חומצות שומן, גליצרול",
+          "מים, מינרלים, ויטמינים"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> אבות המזון הם הרכיבים התזונתיים החיוניים לגוף, כאשר כל אחד מהם ממלא תפקיד מרכזי – פחמימות לאנרגיה, חלבונים לבניית רקמות, שומנים לאנרגיה ולשמירה על מבנה התא, ומינרלים וויטמינים לתפקודים מטבוליים שונים." // Corrected explanation slightly
+      },
+      {
+        question: "מהם חד-סוכרים?",
+        options: [
+          "סוכרוז, לקטוז, מלטוז",
+          "גלוקוז, פרוקטוז, גלקטוז",
+          "עמילוז, עמילופקטין, גליקוגן",
+          "תאית, ליגנין, פקטין"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> חד-סוכרים הם מונומרים – היחידות הבסיסיות של הפחמימות. בין הדוגמאות השכיחות נמנים גלוקוז, פרוקטוז וגלקטוז, אשר משמשים מקור אנרגיה מיידי לגוף." // Corrected explanation slightly
+      },
+      {
+        question: "מהי ריאקציית מייארד?",
+        options: [
+          "תגובה בין סוכרים לחומצות שומן",
+          "תגובה בין חלבונים לפחמימות",
+          "תגובה בין סוכרים מחזרים לחומצות אמינו",
+          "תגובה בין שומנים למינרלים"
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> ריאקציית מייארד היא תגובה כימית מורכבת בין סוכרים מחזרים לחומצות אמינו (או חלבונים) בחום. היא אחראית ליצירת צבע חום, טעמים וארומות אופייניים במזון מבושל או אפוי." // Corrected explanation slightly
+      },
+      {
+        question: "מהם התכונות הפונקציונליות העיקריות של סוכרים?",
+        options: [
+          "מתיקות, מסיסות, השפעה על מרקם, השתתפות בתגובות כימיות (כמו מייארד)", // Added texture influence
+          "חוזק מבני, גמישות, עמידות לחום",
+          "צבע, ריח בלבד",
+          "חומציות, בסיסיות, pH"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> לסוכרים יש תכונות סנסוריות (מתיקות), הם נמסים היטב במים, משפיעים על מרקם המוצר (למשל, צמיגות, קריסטליזציה) ומשתתפים בתגובות כימיות (כמו מייארד וקרמליזציה) המשפיעות על צבע וטעם."
+      },
+      {
+        question: "מהם עמילנים?",
+        options: [
+          "חלבונים סיביים",
+          "רב-סוכרים המורכבים מיחידות גלוקוז ומהווים חומר תשמורת בצמחים", // More specific
+          "שומנים בלתי רוויים",
+          "ויטמינים מסיסים במים"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> עמילנים הם פוליסכרידים (רב-סוכרים) המורכבים משרשראות ארוכות של גלוקוז, ומשמשים כחומר התשמורת האנרגטי העיקרי בצמחים. הם מצויים בגרנולות עמילן במזונות כמו תפוחי אדמה, דגנים וקטניות."
+      },
+      {
+        question: "מהי רטרוגרדציה של עמילן?",
+        options: [
+          "תהליך של עיכול עמילן",
+          "הסתדרות מחדש של שרשראות העמילן (בעיקר עמילוז) לאחר בישול וקירור, המובילה לשינוי מרקם (התקשות)", // More specific
+          "יצירת ג'ל על ידי עמילן בעת חימום עם מים", // This is Gelatinization
+          "תהליך של חימצון עמילן"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> רטרוגרדציה היא תהליך בו שרשראות העמילן, בעיקר עמילוז, מסתדרות מחדש ויוצרות מבנה מסודר וגבישי יותר לאחר בישול וקירור. תהליך זה גורם לשינוי מרקם (למשל, התקשות של לחם ישן) וליציאת מים מהג'ל (סינרזיס)."
+      },
+      {
+        question: "מהם סיבים תזונתיים?",
+        options: [
+          "פחמימות הניתנות לעיכול מהיר",
+          "פחמימות (בעיקר רב-סוכרים) שאינן מפורקות על ידי אנזימי העיכול במעי הדק", // More specific
+          "חלבונים מסיסים במים",
+          "שומנים רוויים"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> סיבים תזונתיים הם רכיבי פחמימות, בעיקר פוליסכרידים (למעט ליגנין), שאינם מתעכלים במעי הדק. הם חשובים לבריאות מערכת העיכול, ויסות רמות סוכר ושומנים בדם ותחושת שובע."
+      },
+      {
+        question: "אילו מהבאים הם סוגי סיבים תזונתיים?",
+        options: [
+          "גלוקוז ופרוקטוז",
+          "עמילוז ועמילופקטין",
+          "תאית, פקטין, בטא-גלוקן, אינולין", // Added Inulin
+          "חומצות אמינו"
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> דוגמאות לסיבים תזונתיים כוללות סיבים בלתי מסיסים כמו תאית (צלולוז) והמיצלולוז, וסיבים מסיסים כמו פקטין, בטא-גלוקן (בשיבולת שועל), גואר גאם ואינולין."
+      },
+      {
+        question: "מהי ההגדרה של חלבון?",
+        options: [
+          "פולימר של סוכרים",
+          "פולימר של חומצות שומן",
+          "פולימר של חומצות אמינו המחוברות בקשרים פפטידיים", // More specific
+          "פולימר של מינרלים"
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> חלבון הוא מקרומולקולה ביולוגית המורכבת משרשרת אחת או יותר של חומצות אמינו, המחוברות ביניהן בקשרים פפטידיים. החלבונים חיוניים למבנה ותפקוד התאים והאורגניזם."
+      },
+      {
+        question: "מהו מבנה ראשוני של חלבון?",
+        options: [
+          "צורת הסליל (אלפא הליקס) או המשטח (בטא שיט) של החלבון", // This is secondary structure
+          "רצף חומצות האמינו הספציפי בשרשרת הפוליפפטידית",
+          "הקיפול התלת-ממדי הכולל של שרשרת פוליפפטידית אחת", // This is tertiary structure
+          "חיבור של מספר שרשראות פפטידים (תת-יחידות) למבנה אחד", // This is quaternary structure
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> המבנה הראשוני של חלבון מתייחס לרצף הליניארי הספציפי של חומצות האמינו בשרשרת הפוליפפטידית, כפי שנקבע על ידי הקוד הגנטי. רצף זה קובע את המבנים המרחביים הגבוהים יותר."
+      },
+      {
+        question: "מהי דנטורציה של חלבון?",
+        options: [
+          "יצירת חלבון חדש",
+          "שינוי (לרוב בלתי הפיך) במבנה המרחבי (שניוני, שלישוני, רביעוני) של החלבון, המוביל לאובדן תפקודו", // More specific
+          "תהליך עיכול החלבון לחומצות אמינו",
+          "יצירת קשרים פפטידיים חדשים בין חומצות אמינו"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> דנטורציה היא תהליך בו חלבון מאבד את הקיפול התלת-ממדי הייחודי שלו (מבנים שניוני, שלישוני ורביעוני), אך לרוב לא את המבנה הראשוני. הדבר גורם לאובדן פעילותו הביולוגית ויכול להיגרם מחום, שינויי pH קיצוניים, חומרים כימיים ועוד."
+      },
+      {
+        question: "מהם אנזימים?",
+        options: [
+          "פחמימות מורכבות",
+          "שומנים בלתי רוויים",
+          "חלבונים בעלי פעילות קטליטית (זרזים ביולוגיים)", // More specific
+          "מינרלים וויטמינים"
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> אנזימים הם חלבונים הפועלים כזרזים ביולוגיים, המאיצים תגובות כימיות ספציפיות בתאים חיים וגם במזון. הם משפיעים על תהליכי הבשלה, קלקול ועיבוד בתעשיית המזון."
+      },
+      {
+        question: "מהם ליפידים?",
+        options: [
+          "פחמימות",
+          "חלבונים",
+          "קבוצה מגוונת של מולקולות ביולוגיות שאינן מסיסות במים, כולל שומנים, שמנים, פוספוליפידים וסטרולים", // More specific
+          "ויטמינים"
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> ליפידים הם קבוצה רחבה של חומרים אורגניים המאופיינים במסיסות נמוכה במים ומסיסות טובה בממסים אורגניים. קבוצה זו כוללת שומנים ושמנים (טריגליצרידים), פוספוליפידים (מרכיבי ממברנות), סטרולים (כמו כולסטרול) ועוד."
+      },
+      {
+        question: "ממה מורכבים שומנים (טריגליצרידים)?",
+        options: [
+          "גלוקוז ופרוקטוז",
+          "חומצות אמינו",
+          "מולקולת גליצרול שאליה קשורות שלוש חומצות שומן",
+          "מינרלים וויטמינים"
+        ],
+        correctIndex: 2,
+        explanation: "<strong>הסבר:</strong> שומנים ושמנים, שהם הסוג העיקרי של ליפידים במזון, מורכבים ממולקולת גליצרול אחת, שאליה קשורות בקשר אסטרי שלוש מולקולות של חומצות שומן. לכן הם נקראים גם טריגליצרידים."
+      },
+      {
+        question: "מה משפיע על תכונות השומנים והשמנים (כמו נקודת התכה)?",
+        options: [
+          "אורך השרשרת של חומצות השומן ודרגת הרוויה שלהן (מספר הקשרים הכפולים)",
+          "סוג הסוכר",
+          "סוג החלבון",
+          "כמות המים"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> תכונות כמו נקודת התכה (האם החומר מוצק או נוזלי בטמפ' החדר), יציבות לחמצון ומרקם מושפעות מאורך שרשראות חומצות השומן וממספר ומיקום הקשרים הכפולים בהן (דרגת הרוויה/אי-רוויה)."
+      },
+      {
+        question: "מהי חשיבותם של שומנים במזון (מעבר לאנרגיה)?",
+        options: [
+          "תורמים למרקם (עסיסיות, רכות), משמשים כנשא לטעמים וארומות, מעכבים רטרוגרדציה של עמילן",
+          "מקור עיקרי לסיבים תזונתיים",
+          "מקור עיקרי לחלבונים",
+          "מקור עיקרי למינרלים"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> השומנים משפיעים רבות על התכונות הסנסוריות של המזון: הם תורמים למרקם (עסיסיות בבשר, פריכות במאפים), משמשים כממסים ונשאים לחומרי טעם וריח מסיסי שומן, ומעכבים תהליכי רטרוגרדציה של עמילן (התקשות)."
+      },
+      {
+        question: "מהם האתגרים העומדים בפני תעשיית המזון?",
+        options: [
+          "התאמה לצרכים תזונתיים משתנים, בטיחות, איכות, קיימות, עלויות, רגולציה", // Expanded
+          "מחיר נמוך, טעם מתוק, צבע בהיר",
+          "כמות גדולה, משקל קל, אריזה קטנה",
+          "מרקם רך, ריח חזק, חיי מדף קצרים"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> אתגרי תעשיית המזון כוללים עמידה בציפיות הצרכנים המשתנות (תזונה, בריאות, נוחות), הבטחת בטיחות ואיכות המזון, ייצור בר-קיימא, התמודדות עם עלויות ושרשרת אספקה מורכבת, ועמידה בדרישות רגולטוריות מחמירות."
+      },
+      {
+        question: "מהם המאפיינים העיקריים של טכנולוגיית המזון?",
+        options: [
+          "יישום עקרונות מדעיים והנדסיים להכנה, עיבוד, שימור, אריזה והפצה של מזון בטוח ואיכותי", // More descriptive
+          "ייצור חומרי גלם בלבד",
+          "שיווק ומכירה של מזון בלבד",
+          "גידול יבולים בלבד"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> טכנולוגיית המזון היא תחום רב-תחומי המיישם עקרונות ממדעי החיים, כימיה, פיזיקה והנדסה לכל אורך שרשרת ייצור המזון – מחומר הגלם ועד למוצר המוגמר – במטרה להבטיח את איכותו, בטיחותו, ערכו התזונתי וחיי המדף שלו."
+      },
+      {
+        question: "אילו מגמות משפיעות על תעשיית המזון בעולם המערבי?",
+        options: [
+          "גלובליזציה, קידמה טכנולוגית, בריאות ואיכות חיים (Wellness), קיימות, נוחות, התאמה אישית", // Expanded
+          "ייצור מסורתי בלבד",
+          "שימוש בחומרי גלם מקומיים בלבד",
+          "התמקדות במחיר נמוך בלבד"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> מגמות עכשוויות כגון גלובליזציה, התפתחויות טכנולוגיות (כולל מזון מותאם אישית), דגש גובר על בריאות, איכות חיים וקיימות, וחיפוש אחר נוחות ופתרונות מהירים, מעצבות מחדש את תעשיית המזון."
+      },
+      {
+        question: "מהי החשיבות של נוחות בתעשיית המזון המודרנית?",
+        options: [
+          "מענה לקצב חיים מהיר: מוצרים מוכנים לאכילה/חימום, ארוחות 'on the go', אריזות קלות לפתיחה ושימוש",
+          "שימוש בחומרי גלם יקרים",
+          "שמירה על מסורת קולינרית",
+          "ייצור בכמויות קטנות"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> נוחות היא גורם מרכזי בשוק המזון המודרני. הצרכן מחפש פתרונות המשתלבים באורח חיים עמוס ומהיר: מוצרים הדורשים הכנה מינימלית, ארוחות שניתן לצרוך בדרכים, ואריזות פונקציונליות."
+      },
+      {
+        question: "מהי תווית מזון?",
+        options: [
+          "אמצעי התקשורת העיקרי בין יצרן המזון לצרכן, המספק מידע על המוצר",
+          "שם המוצר בלבד",
+          "מחיר המוצר בלבד",
+          "תאריך הייצור בלבד"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> תווית המזון היא כלי המידע המרכזי על גבי אריזת המוצר. היא כוללת פרטים כגון שם המוצר, רשימת רכיבים, סימון תזונתי, פרטי יצרן, הוראות שימוש, תאריך תפוגה ואזהרות אלרגנים, ומטרתה לאפשר לצרכן בחירה מושכלת."
+      },
+      {
+        question: "מהו סימון תזונתי?",
+        options: [
+          "פירוט כמותי של רכיבי התזונה העיקריים (אנרגיה, שומנים, פחמימות, חלבונים, נתרן וכו') במנת הגשה או ב-100 גרם מוצר",
+          "שם היצרן בלבד",
+          "משקל המוצר בלבד",
+          "תאריך התפוגה בלבד"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> הסימון התזונתי, המופיע כטבלה על תווית המזון, מפרט את הערכים הכמותיים של רכיבי התזונה המרכזיים במוצר, ומסייע לצרכן להבין את תרומתו התזונתית ולהשוות בין מוצרים."
+      },
+      {
+        question: "מהי אריזה בת קיימא?",
+        options: [
+          "אריזה המתוכננת למזער את השפעתה הסביבתית לאורך מחזור חייה (מקור חומר הגלם, ייצור, שימוש וסילוק)",
+          "אריזה שאינה ניתנת למחזור",
+          "אריזה יקרה במיוחד",
+          "אריזה לשימוש חד פעמי בלבד"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> אריזה בת קיימא מתוכננת להיות ידידותית לסביבה ככל האפשר. היא עשויה מחומרים ממוחזרים או מתחדשים, ניתנת למחזור או לקומפוסטציה, ומטרתה להפחית את כמות הפסולת ואת טביעת הרגל הפחמנית."
+      },
+      {
+        question: "מהי חקלאות מקומית (\"Local food\")?",
+        options: [
+          "מערכת מזון המבוססת על ייצור, עיבוד, הפצה וצריכה באזור גיאוגרפי מוגדר יחסית",
+          "ייבוא מזון מחו\"ל בלבד",
+          "ייצור מזון תעשייתי בלבד",
+          "שימוש בחומרי הדברה בלבד"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> חקלאות מקומית מקדמת את הקשר הישיר בין יצרני המזון לצרכנים באזור מסוים. היא נתפסת כבעלת יתרונות סביבתיים (הפחתת שינוע), כלכליים (תמיכה ביצרנים מקומיים) וחברתיים (חיזוק הקהילה)."
+      },
+      {
+        question: "מהם סיכוני בטיחות מזון?",
+        options: [
+          "סיכונים ביולוגיים (מיקרוביאליים), כימיים (חומרי הדברה, רעלנים, אלרגנים) ופיזיקליים (גופים זרים)", // Categorized
+          "מחיר גבוה, טעם רע, צבע דהוי",
+          "אריזה פגומה, משקל לא תקין, תאריך תפוגה קרוב",
+          "חוסר ויטמינים, חוסר מינרלים, חוסר סיבים"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> סיכוני בטיחות מזון הם גורמים העלולים להפוך את המזון למסוכן לצריכה. הם מחולקים לשלוש קטגוריות עיקריות: ביולוגיים (חיידקים, וירוסים, טפילים), כימיים (חומרי הדברה, תרופות וטרינריות, חומרי ניקוי, רעלנים טבעיים, אלרגנים) ופיזיקליים (שברי זכוכית, מתכת, פלסטיק)."
+      },
+      {
+        question: "מהו <code>HACCP</code>?",
+        options: [
+          "תקן לאיכות הסביבה",
+          "מערכת שיטתית לזיהוי, הערכה ובקרה של סיכונים משמעותיים לבטיחות מזון", // More descriptive
+          "תוכנית לשיווק מזון",
+          "שיטה לגידול אורגני"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> <code>HACCP</code> (Hazard Analysis and Critical Control Points) היא מערכת ניהול מניעתית, המבוססת על ניתוח סיכונים וזיהוי נקודות בקרה קריטיות (CCP) בתהליך הייצור, במטרה להבטיח את בטיחות המזון."
+      },
+      {
+        question: "מהי פעילות מים (<code>a<sub>w</sub></code>)?",
+        options: [
+          "כמות המים הכוללת במזון באחוזים",
+          "מדד למידת הזמינות של המים במזון עבור תגובות כימיות ומיקרוביאליות (יחס בין לחץ אדי המים במזון ללחץ אדי מים טהורים)", // More descriptive
+          "טמפרטורת המים במזון",
+          "צבע המים במזון"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> פעילות מים (<code>a<sub>w</sub></code>) היא מדד ל'חופשיות' או לזמינות של המים במזון להשתתף בתגובות. היא מוגדרת כיחס בין לחץ אדי המים מעל המזון ללחץ אדי מים טהורים באותה טמפרטורה, וערכה נע בין 0 ל-1."
+      },
+      {
+        question: "כיצד פעילות מים משפיעה על קלקול מזון?",
+        options: [
+          "ככל שפעילות המים גבוהה יותר, כך גדל הסיכוי להתפתחות מיקרואורגניזמים ולקלקול מהיר יותר",
+          "פעילות מים נמוכה מעודדת התפתחות מיקרואורגניזמים",
+          "פעילות מים אינה משפיעה על קלקול מזון",
+          "פעילות מים משפיעה רק על טעם המזון"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> פעילות מים היא גורם קריטי המשפיע על יציבות המזון. ככל שערך ה-<code>a<sub>w</sub></code> גבוה יותר, כך המים זמינים יותר, ותנאים נוחים יותר נוצרים לצמיחת מיקרואורגניזמים (חיידקים, שמרים, עובשים) ולתגובות כימיות ואנזימטיות הגורמות לקלקול."
+      },
+      {
+        question: "מהם חיידקים פתוגניים?",
+        options: [
+          "חיידקים מועילים למערכת העיכול (פרוביוטיקה)",
+          "מיקרואורגניזמים (בעיקר חיידקים) הגורמים למחלות באדם",
+          "חיידקים המשמשים לייצור מזון (כמו ביוגורט)",
+          "חיידקים המשפרים את טעם המזון"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> חיידקים פתוגניים הם מיקרואורגניזמים שמסוגלים לגרום למחלות זיהומיות או להרעלות מזון באדם הצורך מזון המזוהם בהם או ברעלנים שהם מייצרים."
+      },
+      {
+        question: "אילו אמצעים משמשים לאינאקטיבציה (השמדה/נטרול) של מיקרואורגניזמים במזון?",
+        options: [
+          "טיפולים תרמיים (חום), קרינה מייננת, לחץ גבוה (HPP)",
+          "הוספת סוכר, הוספת מלח, הוספת חומץ", // These are methods of inhibition, not inactivation
+          "קירור, הקפאה, ייבוש", // These are methods of inhibition
+          "אריזה בוואקום, אריזה באווירה מבוקרת" // These are methods of inhibition
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> תהליכי אינאקטיבציה נועדו להרוג או לנטרל מיקרואורגניזמים במזון. השיטות הנפוצות כוללות טיפולים תרמיים (כמו פסטור ועיקור), שימוש בקרינה מייננת, וטכנולוגיות חדשניות כמו טיפול בלחץ גבוה (HPP)."
+      },
+      {
+        question: "מהי שיטת המשוכות (Hurdle effect)?",
+        options: [
+          "שימוש בגורם עיכוב אחד חזק במיוחד",
+          "שילוב מכוון של מספר גורמי עיכוב (פיזיקליים וכימיים), שכל אחד מהם בפני עצמו אינו מספיק, ליצירת סביבה עוינת להתפתחות מיקרוביאלית", // More descriptive
+          "שימוש בטמפרטורה גבוהה בלבד",
+          "שימוש בחומר משמר אחד בלבד"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> שיטת המשוכות (או טכנולוגיית המחסומים) מתבססת על שילוב מתוכנן של מספר גורמים המעכבים צמיחה מיקרוביאלית (כמו pH נמוך, <code>a<sub>w</sub></code> נמוכה, טמפרטורה נמוכה, חומרים משמרים, פוטנציאל חיזור-חמצון נמוך). השילוב יוצר אפקט סינרגיסטי המונע קלקול ומבטיח בטיחות, גם כשכל גורם בנפרד נמצא ברמה מתונה."
+      },
+      {
+        question: "מהם גורמי קלקול במזון?",
+        options: [
+          "גורמים מיקרוביאליים (צמיחת חיידקים/שמרים/עובשים), אנזימטיים (פעילות אנזימים טבעיים), כימיים (חמצון, השחמה) ופיזיקליים (שינויי מרקם, הפרדת פאזות)",
+          "טעם, צבע, מרקם, ריח", // These are attributes affected by spoilage
+          "חלבונים, פחמימות, שומנים, מים", // These are components of food
+          "ויטמינים, מינרלים, סיבים תזונתיים" // These are components of food
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> קלקול מזון הוא תהליך המביא לירידה באיכותו והופך אותו לבלתי ראוי לצריכה. הוא יכול להיגרם על ידי פעילות מיקרואורגניזמים, פעילות אנזימים המצויים במזון באופן טבעי, תגובות כימיות (כמו חמצון ליפידים או השחמה לא-אנזימטית), ושינויים פיזיקליים (כמו ייבוש, ספיחת לחות, שינויי מרקם)."
+      },
+      {
+        question: "כיצד טמפרטורה גבוהה (שאינה מיועדת לעיקור/פסטור) משפיעה על קלקול מזון?",
+        options: [
+          "מעכבת תהליכים כימיים",
+          "יכולה לזרז תגובות כימיות (כמו חמצון) ופירוק רכיבים תזונתיים רגישים (כמו ויטמינים), וגם לפגוע במרקם", // More descriptive
+          "תמיד משפרת את טעם המזון",
+          "תמיד מונעת התפתחות מיקרואורגניזמים"
+        ],
+        correctIndex: 1,
+        explanation: "<strong>הסבר:</strong> טמפרטורה גבוהה מאיצה את קצב התגובות הכימיות, כולל תגובות קלקול כמו חמצון שומנים או השחמה. היא גם גורמת לפירוק של ויטמינים ורכיבים רגישים אחרים, ויכולה להוביל לשינויים לא רצויים במרקם החלבונים או הפחמימות."
+      },
+      {
+        question: "מהם מקורות לאלרגנים במזון?",
+        options: [
+          "חומרי גלם המכילים אלרגנים ידועים (כמו בוטנים, חלב, ביצים), וזיהום צולב במהלך הייצור או ההכנה",
+          "מים, מלח, סוכר",
+          "אריזות מזון, כלי בישול, מכונות ייצור", // These can be sources of cross-contamination, but not primary sources of allergens themselves
+          "טמפרטורת אחסון, לחות, תאורה"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> אלרגנים יכולים להיות נוכחים במזון כחלק אינהרנטי מחומר הגלם (למשל, חלבון החלב בקזאין), או להגיע למוצר באופן בלתי מכוון כתוצאה מזיהום צולב ממזונות אחרים המעובדים באותו קו ייצור או באותה סביבת הכנה."
+      },
+      {
+        question: "מהן הדרישות הרגולטוריות בתחום בטיחות המזון?",
+        options: [
+          "חוקים, תקנות ותקנים הקובעים את התנאים לייצור, עיבוד, אחסון, שיווק וסימון מזון, הנאכפים על ידי רשויות מוסמכות", // More descriptive
+          "פרסום ושיווק בלבד",
+          "ייצור בכמויות גדולות בלבד",
+          "התמקדות ברווח כלכלי בלבד"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> דרישות רגולטוריות בתחום בטיחות המזון כוללות מערכת של חוקים, תקנות ותקנים (כמו GMP, HACCP, תקני סימון) שמטרתם להגן על בריאות הציבור ולהבטיח שהמזון המשווק בטוח לצריכה. גופים כמו משרד הבריאות ושירות המזון הארצי אחראים על פיקוח ואכיפה."
+      },
+      {
+        question: "מה כוללות תקנות סימון מזון?",
+        options: [
+          "דרישות לגבי המידע שחייב להופיע על תווית המוצר, כגון רשימת רכיבים, סימון תזונתי, תאריך תפוגה, פרטי יצרן, הוראות שימוש ואזהרות אלרגנים",
+          "שם היצרן בלבד",
+          "תאריך הייצור בלבד",
+          "מחיר המוצר בלבד"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> תקנות סימון מזון מחייבות את היצרנים לספק מידע מפורט ושקוף על גבי אריזת המוצר, כדי לאפשר לצרכן לבצע בחירה מושכלת ובטוחה. המידע כולל את הרכב המוצר, ערכו התזונתי, אופן השימוש בו וסיכונים פוטנציאליים (כמו אלרגנים)."
+      },
+      {
+        question: "מהו תפקידם של תקנים ישראליים (ת\"י) בתחום המזון?",
+        options: [
+          "קביעת דרישות מחייבות (בתקנים רשמיים) או וולונטריות לאיכות, בטיחות, הרכב וסימון של מוצרי מזון",
+          "קביעת מחירים למוצרי מזון",
+          "קביעת כמות הייצור של מוצרי מזון",
+          "קביעת סוגי האריזות למוצרי מזון"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> התקנים הישראלים, המגובשים על ידי מכון התקנים, קובעים דרישות ספציפיות למוצרי מזון שונים בנושאי איכות, בטיחות (כולל מגבלות מיקרוביאליות וכימיות), הרכב, שיטות בדיקה וסימון. חלק מהתקנים הם רשמיים (מחייבים על פי חוק) וחלקם וולונטריים."
+      },
+      {
+        question: "מהו תקן 1145 י\"ת?",
+        options: [
+          "תקן כללי לסימון מזון ארוז מראש",
+          "תקן לבטיחות צעצועים",
+          "תקן לבנייה",
+          "תקן לחומרי הדברה"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> תקן ישראלי ת\"י 1145 הוא התקן המרכזי העוסק בסימון מזון ארוז מראש, וקובע את כללי הסימון הכלליים, כולל אופן הצגת רשימת הרכיבים, הסימון התזונתי, תאריכי התפוגה ועוד."
+      },
+      {
+        question: "מהן הדרישות המיקרוביאליות למזון תינוקות?",
+        options: [
+          "נקבעות בתקן ישראלי ספציפי (כמו ת\"י 2202) והן מחמירות במיוחד",
+          "נקבעות על ידי היצרן בלבד",
+          "אינן קיימות דרישות מיקרוביאליות",
+          "נקבעות על ידי הצרכן"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> מזון המיועד לתינוקות כפוף לדרישות מיקרוביאליות מחמירות במיוחד, המפורטות בתקנים ייעודיים (כמו ת\"י 2202), כדי להבטיח את בטיחותה של אוכלוסייה רגישה זו."
+      },
+      {
+        question: "מהו תקן 1291 י\"ת?",
+        options: [
+          "תקן לרכב להובלת מזון בטמפרטורה מבוקרת",
+          "תקן לבטיחות אריזות",
+          "תקן לבטיחות צעצועים",
+          "תקן לחומרי הדברה"
+        ],
+        correctIndex: 0,
+        explanation: "<strong>הסבר:</strong> תקן ישראלי ת\" 1291 עוסק בדרישות מכלי רכב המשמשים להובלת מזון בטמפרטורה מבוקרת (קירור או הקפאה), במטרה להבטיח שמירה על איכות ובטיחות המזון (ר) במהלך ההפצה."
+      }
+    ];
+
+
+    // PASTE THE EXACT SAME JAVASCRIPT CODE FROM introduction_new.html HERE
+    // Using innerHTML for potential formatting in explanations/questions
+     let currentQuestion = 0;
+    const quizContainer = document.getElementById("quiz-container");
+    const nextButton = document.getElementById("next-btn");
+    const viewAllButton = document.getElementById("view-all-btn");
+    const allQuestionsContainer = document.getElementById("all-questions");
+
+    function loadQuestion() {
+      quizContainer.innerHTML = ""; // Clear previous question
+      nextButton.style.display = "none"; // Hide next button initially
+
+      if (currentQuestion < quizData.length) {
+        const q = quizData[currentQuestion];
+        const questionEl = document.createElement("div");
+        questionEl.className = "question-text";
+        // Use innerHTML to render potential code/formatting tags in questions
+        questionEl.innerHTML = `${currentQuestion + 1}. ${q.question}`;
+        quizContainer.appendChild(questionEl);
+
+        const optionsList = document.createElement("ul");
+        optionsList.className = "options";
+        q.options.forEach((option, index) => {
+          const li = document.createElement("li");
+          li.className = "option";
+          const btn = document.createElement("button");
+          btn.className = "option-button";
+          // Use innerHTML for options too, in case they contain HTML
+          btn.innerHTML = option;
+          btn.onclick = () => selectOption(btn, index);
+          li.appendChild(btn);
+          optionsList.appendChild(li);
+        });
+        quizContainer.appendChild(optionsList);
+      } else {
+        quizContainer.innerHTML = `<h2 class="quiz-header" style="text-align:center;">סיימת את כל השאלות! כל הכבוד!</h2>`;
+        viewAllButton.style.display = 'block'; // Keep view all button visible
+        nextButton.style.display = 'none'; // Ensure next button is hidden
+      }
+    }
+
+    function selectOption(button, index) {
+      const q = quizData[currentQuestion];
+      const optionButtons = quizContainer.querySelectorAll(".option-button");
+      optionButtons.forEach(btn => btn.disabled = true); // Disable all buttons after selection
+
+      const correctIcon = '<span class="feedback-icon">✓</span>';
+      const incorrectIcon = '<span class="feedback-icon">✗</span>';
+
+      if (index === q.correctIndex) {
+        button.classList.add("correct");
+        button.innerHTML += correctIcon; // Use innerHTML to add icon
+      } else {
+        button.classList.add("incorrect");
+        button.innerHTML += incorrectIcon;
+        // Highlight the correct answer
+        optionButtons[q.correctIndex].classList.add("correct");
+        optionButtons[q.correctIndex].innerHTML += correctIcon;
+      }
+
+      // Display explanation
+      const explanation = document.createElement("div");
+      explanation.className = "explanation";
+      explanation.innerHTML = q.explanation; // Use innerHTML for formatting
+      quizContainer.appendChild(explanation);
+
+      // Show next button only if there are more questions
+      if (currentQuestion < quizData.length - 1) {
+           nextButton.style.display = "block";
+      } else {
+          nextButton.textContent = "סיימת!"; // Or hide it
+          nextButton.disabled = true;
+          nextButton.style.display = "block"; // Keep it visible but disabled
+      }
+    }
+
+    nextButton.addEventListener("click", () => {
+        if (currentQuestion < quizData.length -1) {
+             currentQuestion++;
+             loadQuestion();
+        }
+    });
+
+    viewAllButton.addEventListener("click", () => {
+      if (allQuestionsContainer.style.display === "none" || allQuestionsContainer.style.display === "") {
+        allQuestionsContainer.style.display = "block";
+        displayAllQuestions();
+        viewAllButton.textContent = "הסתר את כל השאלות";
+      } else {
+        allQuestionsContainer.style.display = "none";
+        viewAllButton.textContent = "הצג את כל השאלות";
+      }
+    });
+
+    function displayAllQuestions() {
+      allQuestionsContainer.innerHTML = '<h2>כל השאלות והתשובות</h2>'; // Add title back
+      quizData.forEach((q, i) => {
+        const qDiv = document.createElement("div");
+        qDiv.className = "all-question";
+
+        const qTitle = document.createElement("h3");
+        // Use innerHTML for question title to render potential formatting
+        qTitle.innerHTML = `${i + 1}. ${q.question}`;
+        qDiv.appendChild(qTitle);
+
+        const ul = document.createElement("ul");
+        q.options.forEach((option, idx) => {
+          const li = document.createElement("li");
+          // Use innerHTML for options
+          li.innerHTML = option;
+          if (idx === q.correctIndex) {
+            li.classList.add("correct-answer");
+            li.innerHTML += " (נכון)"; // Indicate correct answer clearly
+          }
+          ul.appendChild(li);
+        });
+        qDiv.appendChild(ul);
+
+        const exp = document.createElement("div");
+        exp.className = "all-explanation";
+        exp.innerHTML = q.explanation; // Use innerHTML for potential formatting
+        qDiv.appendChild(exp);
+
+        allQuestionsContainer.appendChild(qDiv);
+      });
+    }
+
+    // Initial load
+    loadQuestion();
+  </script>
+</body>
+</html>

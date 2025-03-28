@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>חידון – ניקוי וחיטוי בתעשיית המזון</title>
+  <style>
+    /* PASTE THE EXACT SAME CSS RULES FROM introduction_new.html HERE */
+    :root {
+      --primary-color: #007bff; /* Blue */
+      --primary-hover-color: #0056b3;
+      --correct-color: #28a745; /* Green */
+      --correct-bg-color: #d4edda;
+      --incorrect-color: #dc3545; /* Red */
+      --incorrect-bg-color: #f8d7da;
+      --explanation-bg-color: #e2e3e5; /* Light Gray */
+      --explanation-border-color: #adb5bd;
+      --text-color: #343a40; /* Dark Gray */
+      --light-text-color: #6c757d; /* Medium Gray */
+      --background-color: #f8f9fa; /* Very Light Gray */
+      --container-bg-color: #ffffff; /* White */
+      --border-color: #dee2e6; /* Light Gray Border */
+      --button-secondary-bg: #6c757d; /* Gray for 'View All' */
+      --button-secondary-hover: #5a6268;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      direction: rtl;
+      text-align: right;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 25px;
+      background-color: var(--container-bg-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .quiz-header {
+        text-align: center;
+        margin-bottom: 25px;
+        color: var(--primary-color);
+        font-size: 1.8em;
+        font-weight: 600;
+    }
+
+    .question-container {
+      background-color: var(--container-bg-color); /* Consistent background */
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .question-text {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    /* Ensure LTR spans inside RTL text are handled visually */
+    .question-text span[dir="ltr"] {
+        display: inline-block;
+        margin: 0 0.2em;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .option {
+      margin-bottom: 12px;
+    }
+
+    button.option-button {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 1em;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background-color: var(--container-bg-color);
+      color: var(--text-color);
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+      text-align: right;
+    }
+
+    button.option-button:hover:not(:disabled) {
+      background-color: #f1f3f5; /* Lighter gray on hover */
+      border-color: #ced4da;
+    }
+
+    button.option-button:active:not(:disabled) {
+        transform: scale(0.99);
+    }
+
+    button.option-button:disabled {
+        cursor: default;
+        opacity: 0.8;
+    }
+
+    button.option-button.correct {
+      background-color: var(--correct-bg-color);
+      border-color: var(--correct-color);
+      color: var(--correct-color);
+      font-weight: 500;
+    }
+
+    button.option-button.incorrect {
+      background-color: var(--incorrect-bg-color);
+      border-color: var(--incorrect-color);
+      color: var(--incorrect-color);
+      font-weight: 500;
+    }
+
+     button.option-button .feedback-icon {
+        float: left;
+        font-weight: bold;
+        margin-left: 10px;
+     }
+
+    .explanation {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: var(--explanation-bg-color);
+      border-right: 4px solid var(--explanation-border-color); /* Right border for RTL */
+      border-radius: 4px;
+      font-size: 0.95em;
+      color: var(--light-text-color);
+    }
+    .explanation strong {
+        color: var(--text-color);
+    }
+    /* Ensure LTR math/code in explanations is handled */
+    .explanation span[dir="ltr"], .explanation [dir="ltr"], .explanation code {
+        display: inline-block;
+        direction: ltr;
+        text-align: left;
+        margin: 0 0.2em;
+        font-family: monospace; /* Use monospace for code-like elements */
+        background-color: #d8dadc; /* Slightly darker background for code */
+        padding: 0.1em 0.3em;
+        border-radius: 3px;
+    }
+
+
+    .quiz-controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 25px;
+    }
+
+    .control-button {
+      padding: 10px 25px;
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .control-button:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    #next-btn {
+      background-color: var(--primary-color);
+    }
+    #next-btn:hover {
+      background-color: var(--primary-hover-color);
+    }
+
+    #view-all-btn {
+      background-color: var(--button-secondary-bg);
+    }
+     #view-all-btn:hover {
+      background-color: var(--button-secondary-hover);
+    }
+
+    .all-questions-container {
+      display: none;
+      margin-top: 30px;
+      max-height: 500px; /* Increased height */
+      overflow-y: auto;
+      background-color: var(--container-bg-color);
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+     .all-questions-container h2 {
+        text-align: center;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+     }
+
+    .all-question {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .all-question:last-child {
+        border-bottom: none;
+    }
+
+     .all-question h3 {
+        font-size: 1.1em;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 10px;
+     }
+     .all-question ul {
+         list-style: none;
+         padding-right: 15px; /* Indentation for options */
+         margin-top: 5px;
+         margin-bottom: 10px;
+     }
+      .all-question li {
+         margin-bottom: 5px;
+         color: var(--light-text-color);
+      }
+      .all-question li.correct-answer {
+          color: var(--correct-color);
+          font-weight: 500;
+      }
+       .all-question .all-explanation {
+           font-size: 0.9em;
+           color: var(--light-text-color);
+           padding-right: 15px;
+       }
+        .all-question .all-explanation strong {
+           color: var(--text-color);
+        }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="quiz-header">חידון – ניקוי וחיטוי בתעשיית המזון</h1>
+    <div id="quiz-container" class="question-container">
+        <!-- Question content will be loaded here by JavaScript -->
+    </div>
+    <div class="quiz-controls">
+        <button id="view-all-btn" class="control-button">הצג את כל השאלות</button>
+        <button id="next-btn" class="control-button" style="display: none;">שאלה הבאה</button>
+    </div>
+    <div id="all-questions" class="all-questions-container">
+        <h2>כל השאלות והתשובות</h2>
+        <!-- All questions content will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    // Renamed 'questions' to 'quizData' for consistency
+    const quizData = [
+      {
+        question: "מהי החשיבות של תהליכי ניקוי וחיטוי בתעשיית המזון?",
+        options: [
+          "שיפור הטעם של המוצר",
+          "מניעת חוסר אחידות במוצר ושמירה על בריאות הלקוחות",
+          "הפחתת עלויות ייצור",
+          "הארכת חיי המדף של המוצר"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> תהליכי ניקוי וחיטוי חיוניים למניעת חוסר אחידות, קלקולים, פגיעה בריאותית בלקוחות ואפילו סגירת החברה."
+      },
+      {
+        question: "מהי ההגדרה של ניקוי בתהליכי ניקוי וחיטוי?",
+        options: [
+          "הסרת חומרים הקשורים בצורה רופפת לפני השטח",
+          "הורדת כמות המיקרואורגניזמים לרמה המקובלת",
+          "הסרה מוחלטת של משקעים הקשורים לפני השטח",
+          "תהליך שמבטיח הרס מוחלט של כל תא חי"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ניקוי מוגדר כהסרה מוחלטת של המשקעים והלכלוך הדבקים לפני השטח."
+      },
+      {
+        question: "מהי מטרת החיטוי בתעשיית המזון?",
+        options: [
+          "הסרת כל החומרים האורגניים מפני השטח",
+          "הורדת כמות המיקרואורגניזמים לרמה המקובלת בסטנדרט",
+          "השמדת כל סוגי הספורות",
+          "יצירת סביבה סטרילית לחלוטין"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> החיטוי נועד להוריד את כמות המיקרואורגניזמים לרמה המקובלת, ובמקביל להשמיד חלק מהספורות, אך לא מבטיח סביבה סטרילית לחלוטין."
+      },
+      {
+        question: "מהי סטריליזציה?",
+        options: [
+          "תהליך ניקוי יסודי של הציוד",
+          "תהליך שמוריד את כמות המיקרואורגניזמים לרמה בטוחה",
+          "הרס מוחלט של כל תא חי, כולל וירוסים וספורות",
+          "חיטוי באמצעות חומרים כימיים בלבד"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> סטריליזציה מבטיחה השמדת כל התא החי – כולל וירוסים, ספורות ומיקרואורגניזמים נוספים."
+      },
+      {
+        question: "מהו CIP (Cleaning In Place)?",
+        options: [
+          "ניקוי של ציוד באמצעות פירוק וניקוי ידני",
+          "ניקוי של ציוד או צנרת ללא פירוק או פתיחה",
+          "ניקוי באמצעות טמפרטורות גבוהות בלבד",
+          "ניקוי באמצעות חומרים כימיים חזקים בלבד"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> CIP הוא תהליך ניקוי שבו מנקים ציוד או צנרת ללא צורך בפירוק, עם התערבות מינימלית של המפעיל."
+      },
+      {
+        question: "מהו אחד היתרונות של CIP לעומת ניקיון ידני?",
+        options: [
+          "עלות נמוכה יותר",
+          "תלות נמוכה יותר בידע ובכישורי העובד",
+          "גמישות רבה יותר בסוגי הניקוי",
+          "אפשרות לנקות אזורים שקשה להגיע אליהם באופן ידני בלבד"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> תהליך CIP מבטיח חזרתיות ושליטה בכל הפרמטרים, ואינו תלוי במידה רבה בכישורי העובד כמו בניקיון ידני."
+      },
+      {
+        question: "אילו גורמים משפיעים על איכות תהליך ה-CIP?",
+        options: [
+          "רק סוג הציוד המתנקה",
+          "רק זמן, טמפרטורה וספיקה",
+          "הציוד המתנקה, זמן, טמפרטורה, ספיקה, כימיה נכונה ושליטה ובקרה",
+          "רק סוג חומרי הניקוי"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> איכות תהליך ה-CIP תלויה במספר גורמים – ציוד, זמן, טמפרטורה, ספיקה, התאמת הכימיה וכן שליטה ובקרה על התהליך."
+      },
+      {
+        question: "מהו <code>Circuit</code> בהקשר של CIP?",
+        options: [
+          "מעגל חשמלי במערכת ה-CIP",
+          "קבוצת ציוד שמנוקה בו זמנית על ידי CIP",
+          "סוג של חומר ניקוי המשמש ב-CIP",
+          "שלב בתהליך ה-CIP"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <code>Circuit</code> מתייחס לקבוצת ציוד או מסלול שמנוקה בו זמנית בתהליך ה-CIP."
+      },
+      {
+        question: "מהו <code>CIP program</code>?",
+        options: [
+          "רשימת הציוד שיש לנקות",
+          "סדרת פעולות המאפשרות ניקוי של ה-circuit",
+          "תוכנה לשליטה על הטמפרטורה בתהליך ה-CIP",
+          "ריכוז חומרי הניקוי המשמשים ב-CIP"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <code>CIP program</code> הוא סדרת פעולות מובנות שמאפשרת לבצע את תהליך הניקוי בצורה מסודרת ואפקטיבית."
+      },
+      {
+        question: "מהי <code>Phase</code> בתוכנית CIP?",
+        options: [
+          "חלק בתוכנית ה-CIP המתאים לחומר ניקוי ספציפי",
+          "שלב בקרה על איכות הניקוי",
+          "מדידת הטמפרטורה בזמן הניקוי",
+          "בדיקת הריכוז של חומרי הניקוי"
+        ],
+        correctIndex: 0, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> <code>Phase</code> הוא חלק מהתוכנית המוקדש לשימוש בחומר ניקוי ספציפי ולביצוע פעולה מוגדרת בתהליך."
+      },
+      {
+        question: "מהם הפרמטרים הקריטיים ל-CIP (TACT)?",
+        options: [
+          "Time, Action, Cost, Temperature",
+          "Time, Action, Chemical, Temperature",
+          "Temperature, Action, Cleaning, Time",
+          "Time, Chemical, Action, Cost"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> הפרמטרים הקריטיים הם זמן (<code>Time</code>), פעולה (<code>Action</code>), כימיה (<code>Chemical</code>) וטמפרטורה (<code>Temperature</code>)."
+      },
+      {
+        question: "אילו מיכלים ניתן למצוא במבנה מורחב של חוות CIP?",
+        options: [
+          "מיכל מים בלבד",
+          "מיכל סודה בלבד",
+          "מיכל שטיפה ראשונה, מיכל מים, מיכל סודה, מיכל חומצה, מיכל מים חמים ומיכל חומר חיטוי",
+          "מיכל חומצה ומיכל חומר חיטוי בלבד"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> במבנה מורחב של חוות CIP כלולים מספר מיכלים – לרבות מיכל לשטיפה ראשונה, מים, סודה, חומצה, מים חמים וחומר חיטוי."
+      },
+      {
+        question: "מהו השלב הראשון בשלבי ה-CIP?",
+        options: [
+          "סחרור תמיסה חמה אלקאלית",
+          "שטיפה במים טריים",
+          "שטיפה ראשונה להסרת לכלוך גס",
+          "סחרור חומצי"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> השלב הראשון בתהליך ה-CIP הוא ביצוע שטיפה ראשונה להסרת לכלוך גס מהציוד."
+      },
+      {
+        question: "מהי מטרת השטיפה הראשונה ב-CIP?",
+        options: [
+          "חיטוי המערכת",
+          "הסרת משקעי אבנית ומלחים",
+          "הסרת שאריות חומר הניקוי האלקאלי",
+          "הסרת לכלוך גס וחומר אורגני שאינו קשור בחוזקה לציוד"
+        ],
+        correctIndex: 3, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> מטרת השטיפה הראשונה היא להסיר לכלוך גס וחומר אורגני שאינו מצורף בצורה חזקה לציוד."
+      },
+      {
+        question: "מהי מטרת סחרור תמיסת הסודה החמה במעגל סגור?",
+        options: [
+          "הסרת משקעי אבנית",
+          "ניקוי עמוק של הציוד",
+          "חיטוי הציוד",
+          "שטיפת שאריות חומרי הניקוי"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> סחרור תמיסת הסודה החמה במעגל סגור נועד לבצע ניקוי עמוק של הציוד."
+      },
+      {
+        question: "מהי מטרת השימוש בחומצה בתהליך ה-CIP?",
+        options: [
+          "הסרת שומנים וחלבונים",
+          "הסרת משקעי אבנית ומלחים",
+          "חיטוי המערכת",
+          "ניקוי כללי של הציוד"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> השימוש בחומצה בתהליך ה-CIP מכוון להסרת משקעי אבנית ומלחים המצטברים על פני הציוד."
+      },
+      {
+        question: "מהי מטרת החיטוי בשלבי ה-CIP?",
+        options: [
+          "הסרת כל סוגי הלכלוך",
+          "הסרת משקעי אבנית",
+          "הפחתת כמות המיקרואורגניזמים לרמה בטוחה",
+          "הסרת שאריות חומרי הניקוי"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> תהליך החיטוי מיועד להוריד את כמות המיקרואורגניזמים לרמה בטוחה לשימוש."
+      },
+      {
+        question: "מהם הגורמים העיקריים המשפיעים על הפעילות הכימית של חומרי הניקוי?",
+        options: [
+          "טמפרטורה וזמן",
+          "ריכוז, סוג החומר, pH, מתח הפנים, איכות המים וסוג המשקעים",
+          "רק ריכוז החומר",
+          "רק טמפרטורה ו-pH"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> הפעילות הכימית של חומרי הניקוי מושפעת ממספר גורמים, בהם ריכוז, סוג החומר, pH, מתח הפנים, איכות המים וסוג המשקעים."
+      },
+      {
+        question: "מהם היתרונות של שימוש בסודה קאוסטית (<code>NaOH</code>) בניקוי בסיסי?",
+        options: [
+          "יעילה רק בהסרת שומנים",
+          "ממיסה סוכרים, שומנים וחלבונים והורגת בקטריות",
+          "בטוחה יותר לשימוש מחומצות",
+          "יעילה רק בטמפרטורות נמוכות"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> סודה קאוסטית יעילה בכך שהיא ממיסה סוכרים, שומנים וחלבונים ובכך מסייעת בהורדת מספר הבקטריות."
+      },
+      {
+        question: "מהם היתרונות של שימוש בחומצה חנקתית (<code>HNO<sub>3</sub></code>) בניקוי חומצי?",
+        options: [
+          "יעילה רק בהסרת חלבונים",
+          "מסירה מינרלים באופן מלא וממיסה באופן חלקי שומנים, חלבונים וסוכרים",
+          "בטוחה יותר לשימוש מסודה קאוסטית",
+          "יעילה רק בטמפרטורות גבוהות"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> חומצה חנקתית משמשת להסרת מינרלים בצורה מלאה ובמקביל ממיסה באופן חלקי שומנים, חלבונים וסוכרים."
+      },
+      {
+        question: "מהו ריכוז הסודה הקאוסטית (<code>NaOH</code>) המקובל בניקוי בסיסי?",
+        options: [
+          "0.1–0.5%",
+          "0.5–1%",
+          "1–1.5%",
+          "2–2.5%"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ברוב תהליכי הניקוי הבסיסיים, ריכוז הסודה הקאוסטית המקובל הוא בין <code>1%</code> ל-<code>1.5%</code>."
+      },
+      {
+        question: "מהו החומר המקובל לניקוי חומצי?",
+        options: [
+          "סודה קאוסטית",
+          "חומצה זרחתית (<code>H<sub>3</sub>PO<sub>4</sub></code>) וחומצה חנקתית (<code>HNO<sub>3</sub></code>)",
+          "חומצה פראצטית",
+          "מי חמצן"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> לניקוי חומצי נעשה שימוש בחומצה זרחתית ובחומצה חנקתית."
+      },
+      {
+        question: "מה הריכוז המינימלי של חומצה פראצטית לחיטוי?",
+        options: [
+          "10 ppm",
+          "50 ppm",
+          "100 ppm",
+          "200 ppm"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> הריכוז המינימלי הנדרש של חומצה פראצטית הוא <code>100 ppm</code>."
+      },
+      {
+        question: "מה הטמפרטורה המומלצת לשימוש בניקוי בסיסי?",
+        options: [
+          "20–40 מעלות צלזיוס",
+          "40–60 מעלות צלזיוס",
+          "60–80 מעלות צלזיוס",
+          "80–85 מעלות צלזיוס"
+        ],
+        correctIndex: 3, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בטמפרטורה של <code>80–85°C</code> מתקיים ניקוי בסיסי יעיל."
+      },
+      {
+        question: "מה הטמפרטורה המומלצת לשימוש בניקוי חומצי?",
+        options: [
+          "20–40 מעלות צלזיוס",
+          "60–80 מעלות צלזיוס",
+          "80–85 מעלות צלזיוס",
+          "90–100 מעלות צלזיוס"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> ניקוי חומצי מתבצע בטמפרטורה של <code>60–80°C</code>."
+      },
+      {
+        question: "מהם שני סוגי השטיפה ליצירת כוח מכאני במיכלים?",
+        options: [
+          "שטיפה בלחץ גבוה ושטיפה בטמפרטורה גבוהה",
+          "שימוש ב-<code>SPRAY BALL</code> ושטיפה בלחץ נמוך",
+          "שימוש ב-<code>SPRAY BALL</code> ובממטרת לחץ גבוה",
+          "שטיפה בחומרים כימיים ושטיפה במים"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בתהליך נעשה שימוש בשתי שיטות – שימוש ב-<code>SPRAY BALL</code> (עם לחץ נמוך) ובממטרת לחץ גבוה ליצירת כוח מכאני."
+      },
+      {
+        question: "מהו הלחץ המומלץ ב-<code>SPRAY BALL</code> לתהליך CIP יעיל?",
+        options: [
+          "0.5–1 בר",
+          "1.5–2.5 בר",
+          "3–4 בר",
+          "4.5–5 בר"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> הלחץ האידיאלי ב-<code>SPRAY BALL</code> הוא בין <code>1.5</code> ל-<code>2.5 בר</code>."
+      },
+      {
+        question: "מהם הפרמטרים המבוקרים במהלך מעגל CIP?",
+        options: [
+          "רק טמפרטורה וריכוז",
+          "ספיקה, טמפרטורה, ריכוז, זמן, מפלס במיכלים, מצב משאבות ואלמנטים במסלול",
+          "רק מפלס במיכלים ומצב משאבות",
+          "רק זמן וספיקה"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> תהליך CIP מבוקר על ידי מספר פרמטרים – ספיקה, טמפרטורה, ריכוז, זמן, מפלס במיכלים, וכן מצב המשאבות והאלמנטים במסלול."
+      },
+      {
+        question: "מהו \"קצה עיוור\" (<code>Dead end</code>) בצנרת ייצור?",
+        options: [
+          "צינור שמחובר למשאבה",
+          "כל חיבור בצנרת",
+          "חיבור T שאורכו גדול מחצי קוטר הצינור באזור שאין אליו זרימה",
+          "צינור ישר ללא חיבורים"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> \"קצה עיוור\" (<code>Dead end</code>) מתייחס לחיבור T שאורכו גדול מחצי קוטר הצינור, באזור שבו לא מתרחשת זרימה."
+      },
+      {
+        question: "מהי הספיקה המומלצת לממטרה (לצינור) לניקוי?",
+        options: [
+          "0.5 מ\"ק/שעה",
+          "1 מ\"ק/שעה",
+          "1.5 מ\"ק/שעה",
+          "2 מ\"ק/שעה"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> הספיקה המומלצת היא <code>1.5 מ\"ק/שעה</code>."
+      },
+      {
+        question: "מה יש לוודא בסיום תהליך CIP באמצעות מתודולוגיית נפטון?",
+        options: [
+          "טמפרטורה תקינה",
+          "לחץ תקין",
+          "תוצאת ATP תקינה ביחס לתוצאת הרקע",
+          "ריכוז חומרים תקין"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> חשוב לוודא שהתוצאה של בדיקת <code>ATP</code> היא תקינה ביחס לתוצאת הרקע, כדי לאשר ניקיון יעיל."
+      },
+      {
+        question: "מה תפקידם של מיכלי הסודה והחומצה בחוות CIP?",
+        options: [
+          "אחסון מים בלבד",
+          "אחסון חומרי חיטוי בלבד",
+          "אחסון תמיסות ניקוי בסיסיות (סודה) וחומציות (חומצה)",
+          "אחסון חומרי גלם לייצור"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> המיכלים משמשים לאחסון תמיסות ניקוי – בסיסיות עם סודה וחומציות עם חומצה."
+      },
+      {
+        question: "מהי המשמעות של המונח \"ספיקה\" בתהליך CIP?",
+        options: [
+          "טמפרטורת הנוזל",
+          "לחץ הנוזל",
+          "קצב הזרימה של הנוזל במערכת (ליטרים לשעה)",
+          "ריכוז חומרי הניקוי"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> \"ספיקה\" מתייחסת לקצב הזרימה של הנוזל במערכת, נמדד בליטרים לשעה."
+      },
+      {
+        question: "מהו תפקיד הבוחש (<code>agitator</code>) במיכלים במהלך CIP?",
+        options: [
+          "שמירה על טמפרטורה אחידה",
+          "הגברת הלחץ במיכל",
+          "יצירת זרימה אחידה וכיסוי מלא של שטח הפנים בתמיסת הניקוי",
+          "ניקוז המיכל בסיום התהליך"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> הבוחש מסייע ביצירת זרימה אחידה ומבטיח כיסוי מלא של שטח הפנים במיכל על ידי תמיסת הניקוי."
+      },
+      {
+        question: "מהם היתרונות של שימוש ב-CIP במחלבות?",
+        options: [
+          "חיסכון בעלויות חומרי הניקוי בלבד",
+          "שיפור הבטיחות, היעילות, איכות הניקיון וקיצור זמני השבתה של המערכות",
+          "קיצור זמני השבתה בלבד",
+          "שיפור הבטיחות בלבד"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> שימוש ב-CIP במחלבות תורם לשיפור בטיחות המזון, יעילות הניקוי, איכות התהליך וקיצור זמני השבתה של המערכות."
+      },
+      {
+        question: "מהי המטרה של שלב \"הכנה לסודה\" ב-CIP?",
+        options: [
+          "חימום המערכת",
+          "קירור המערכת",
+          "דחיפת המים הקיימים במערכת באמצעות תמיסת הסודה וניקוזם למערכת השפכים",
+          "מילוי המערכת במים בלבד"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בשלב זה, תמיסת הסודה משמשת לדחיפת המים הקיימים במערכת ולכוונתם למערכת השפכים."
+      },
+      {
+        question: "מה המטרה של שלב \"הכנה לחומצה\" ב-CIP?",
+        options: [
+          "חימום המערכת",
+          "קירור המערכת",
+          "דחיפת המים הקיימים במערכת באמצעות תמיסת החומצה וניקוזם למערכת השפכים",
+          "מילוי המערכת במים בלבד"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בשלב זה נעשה שימוש בתמיסת החומצה לדחיפת המים מהמערכת ולניהולם למערכת השפכים."
+      },
+      {
+        question: "מהי המטרה של שימוש במים חמים בשלב החיטוי ב-CIP?",
+        options: [
+          "קירור המערכת",
+          "חימום המערכת בלבד",
+          "הפחתת כמות המיקרואורגניזמים באמצעות טמפרטורה גבוהה",
+          "ניקוי גס של המערכת"
+        ],
+        correctIndex: 2, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> שימוש במים חמים מסייע בהפחתת כמות המיקרואורגניזמים, הודות לטמפרטורה הגבוהה."
+      },
+      {
+        question: "מהי חשיבות השליטה והבקרה בתהליך ה-CIP?",
+        options: [
+          "שמירה על עלויות נמוכות",
+          "הבטחת תהליך ניקוי יעיל ועקבי",
+          "קיצור זמן הניקוי בלבד",
+          "שיפור הטעם של המוצר"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> שליטה ובקרה קפדנית בתהליך CIP מבטיחות ניקוי יעיל ועקבי של המערכת."
+      },
+      {
+        question: "מהי החשיבות של בדיקת פעילות ה-<code>SPRAY BALL</code> וניקויו?",
+        options: [
+          "שמירה על לחץ מים תקין",
+          "מניעת סתימות והבטחת פיזור אחיד של תמיסת הניקוי",
+          "שמירה על טמפרטורה תקינה",
+          "שמירה על ריכוז חומרים תקין"
+        ],
+        correctIndex: 1, // Corrected index from original file
+        explanation: "<strong>הסבר:</strong> בדיקת פעילות ה-<code>SPRAY BALL</code> חשובה למניעת סתימות ולהבטחת פיזור אחיד של תמיסת הניקוי."
+      }
+    ];
+
+
+    // PASTE THE EXACT SAME JAVASCRIPT CODE FROM introduction_new.html HERE
+    // Modified JS slightly to use innerHTML for elements that might contain <code> or <sub> tags
+     let currentQuestion = 0;
+    const quizContainer = document.getElementById("quiz-container");
+    const nextButton = document.getElementById("next-btn");
+    const viewAllButton = document.getElementById("view-all-btn");
+    const allQuestionsContainer = document.getElementById("all-questions");
+
+    function loadQuestion() {
+      quizContainer.innerHTML = ""; // Clear previous question
+      nextButton.style.display = "none"; // Hide next button initially
+
+      if (currentQuestion < quizData.length) {
+        const q = quizData[currentQuestion];
+        const questionEl = document.createElement("div");
+        questionEl.className = "question-text";
+        // Use innerHTML to render potential code tags in questions
+        questionEl.innerHTML = `${currentQuestion + 1}. ${q.question}`;
+        quizContainer.appendChild(questionEl);
+
+        const optionsList = document.createElement("ul");
+        optionsList.className = "options";
+        q.options.forEach((option, index) => {
+          const li = document.createElement("li");
+          li.className = "option";
+          const btn = document.createElement("button");
+          btn.className = "option-button";
+          // Use innerHTML for options too, in case they contain HTML
+          btn.innerHTML = option;
+          btn.onclick = () => selectOption(btn, index);
+          li.appendChild(btn);
+          optionsList.appendChild(li);
+        });
+        quizContainer.appendChild(optionsList);
+      } else {
+        quizContainer.innerHTML = `<h2 class="quiz-header" style="text-align:center;">סיימת את כל השאלות! כל הכבוד!</h2>`;
+        viewAllButton.style.display = 'block'; // Keep view all button visible
+        nextButton.style.display = 'none'; // Ensure next button is hidden
+      }
+    }
+
+    function selectOption(button, index) {
+      const q = quizData[currentQuestion];
+      const optionButtons = quizContainer.querySelectorAll(".option-button");
+      optionButtons.forEach(btn => btn.disabled = true); // Disable all buttons after selection
+
+      const correctIcon = '<span class="feedback-icon">✓</span>';
+      const incorrectIcon = '<span class="feedback-icon">✗</span>';
+
+      if (index === q.correctIndex) {
+        button.classList.add("correct");
+        button.innerHTML += correctIcon; // Use innerHTML to add icon
+      } else {
+        button.classList.add("incorrect");
+        button.innerHTML += incorrectIcon;
+        // Highlight the correct answer
+        optionButtons[q.correctIndex].classList.add("correct");
+        optionButtons[q.correctIndex].innerHTML += correctIcon;
+      }
+
+      // Display explanation
+      const explanation = document.createElement("div");
+      explanation.className = "explanation";
+      explanation.innerHTML = q.explanation; // Use innerHTML for formatting
+      quizContainer.appendChild(explanation);
+
+      // Show next button only if there are more questions
+      if (currentQuestion < quizData.length - 1) {
+           nextButton.style.display = "block";
+      } else {
+          nextButton.textContent = "סיימת!"; // Or hide it
+          nextButton.disabled = true;
+          nextButton.style.display = "block"; // Keep it visible but disabled
+      }
+    }
+
+    nextButton.addEventListener("click", () => {
+        if (currentQuestion < quizData.length -1) {
+             currentQuestion++;
+             loadQuestion();
+        }
+    });
+
+    viewAllButton.addEventListener("click", () => {
+      if (allQuestionsContainer.style.display === "none" || allQuestionsContainer.style.display === "") {
+        allQuestionsContainer.style.display = "block";
+        displayAllQuestions();
+        viewAllButton.textContent = "הסתר את כל השאלות";
+      } else {
+        allQuestionsContainer.style.display = "none";
+        viewAllButton.textContent = "הצג את כל השאלות";
+      }
+    });
+
+    function displayAllQuestions() {
+      allQuestionsContainer.innerHTML = '<h2>כל השאלות והתשובות</h2>'; // Add title back
+      quizData.forEach((q, i) => {
+        const qDiv = document.createElement("div");
+        qDiv.className = "all-question";
+
+        const qTitle = document.createElement("h3");
+        // Use innerHTML for question title to render potential formatting
+        qTitle.innerHTML = `${i + 1}. ${q.question}`;
+        qDiv.appendChild(qTitle);
+
+        const ul = document.createElement("ul");
+        q.options.forEach((option, idx) => {
+          const li = document.createElement("li");
+          // Use innerHTML for options
+          li.innerHTML = option;
+          if (idx === q.correctIndex) {
+            li.classList.add("correct-answer");
+            li.innerHTML += " (נכון)"; // Indicate correct answer clearly
+          }
+          ul.appendChild(li);
+        });
+        qDiv.appendChild(ul);
+
+        const exp = document.createElement("div");
+        exp.className = "all-explanation";
+        exp.innerHTML = q.explanation; // Use innerHTML for potential formatting
+        qDiv.appendChild(exp);
+
+        allQuestionsContainer.appendChild(qDiv);
+      });
+    }
+
+    // Initial load
+    loadQuestion();
+  </script>
+</body>
+</html>
